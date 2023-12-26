@@ -1,0 +1,36 @@
+{
+  "name": "threejs-addons",
+  "version": "0.1.0",
+  "description": "free & opensource threejs addons to boost productivity",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/leemlwando/ThreeJS-Addons.git"
+  },
+  "keywords": [
+    "THREEJS",
+    "CAMERA",
+    "CONTROLLER",
+    "TRANSLATION-CONTROLLER",
+    "CAMERA-CONTROLLER",
+    "TRANSLATION",
+    "OBJECT"
+  ],
+  "author": "Lee M. Lwando <leemlwando@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leemlwando/ThreeJS-Addons/issues"
+  },
+  "homepage": "https://github.com/leemlwando/ThreeJS-Addons#readme",
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.160.0",
+    "typedoc": "^0.25.4"
+  }
+}

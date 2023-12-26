@@ -4,9 +4,15 @@ import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockCont
 
 
 export class OrbitControlsWrapper extends OrbitControls {
-    userData: UserData
+    userData: UserData | null = null
+    constructor(object: any, domElement?: HTMLElement) {
+        super(object, domElement)
+    }
 }
 
 export class PointerLockControlsWrapper extends PointerLockControls {
-    userData: UserData
+    userData: UserData | null = null
+    constructor(object: any, domElement?: HTMLElement) {
+        super(object, domElement)
+    }
 }
