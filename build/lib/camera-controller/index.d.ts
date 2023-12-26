@@ -1,5 +1,5 @@
 import { Scene } from 'three';
-import { CameraControlType, CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types';
+import { CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types';
 /**
  * @description CameraController class for managing camera and its respective controls.
  */
@@ -38,9 +38,9 @@ export declare class CameraController {
     /** calls updateProjectionMatrix on current active camera */
     updateProjectionMatrix(): void;
     /** disable previous controls */
-    disableControlsByControllerIndex(index: Index): void;
+    private disableControlsByControllerIndex;
     /** enable active controllers control by activeControlType */
-    enableActiveControllerControl(activeControlType: CameraControlType): void;
+    private enableActiveControllerControl;
     /** toggle Control By index */
-    toggleControlTypeByIndex(previousControlTypeIndex: Index, currentControlTypeIndex: Index): void;
+    private toggleControlTypeByIndex;
 }
