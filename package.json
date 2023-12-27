@@ -1,10 +1,11 @@
 {
   "name": "@threejs-addons/threejs-addons",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "free & opensource threejs addons to boost productivity",
   "main": "build/index.js",
   "scripts": {
     "build": "tsc",
+    "publish": "npm publish --access public",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
