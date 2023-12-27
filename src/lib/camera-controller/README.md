@@ -17,7 +17,8 @@ This module is designed to assist with managing multiple cameras and their respe
 1. Instantiate your camera controller and pass THREEJS Scene an argument
 
 ```js
-import { CameraController } from 'threejs-addons/build/lib/camera-controller';
+import { CameraController } from '@threejs-addons/threejs-addons';
+import { ControlType } from '@threejs-addons/threejs-addons/build/types';
 
 let scene = new THREE.Scene(); //create a THREEJS Scene
 
@@ -30,8 +31,6 @@ const cameraController = new CameraController({ scene: scene });
 `in the example below the cameras are coming from a gltf model already imported in the scene. However this can be a list of any camera you wish to provide to the controller.`
 
 ```js
-import { ControlType } from 'threejs-addons/build/types';
-
 for(let i = 0; i < gltf.cameras.length; i++){
 
     cameraController.configureController({
