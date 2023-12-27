@@ -1,2 +1,3 @@
 import { CameraController } from './lib/camera-controller';
-export { CameraController };
+import { TranslationController } from './lib/translation-controller';
+export { CameraController, TranslationController };

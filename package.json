@@ -1,6 +1,6 @@
 {
   "name": "@threejs-addons/threejs-addons",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "free & opensource threejs addons to boost productivity",
   "main": "build/index.js",
   "scripts": {
@@ -28,12 +28,13 @@
   },
   "homepage": "https://github.com/leemlwando/threejs-addons#readme",
   "dependencies": {
-
+    "@dimforge/rapier3d": "^0.11.2",
+    "@dimforge/rapier3d-compat": "^0.11.2",
     "three": "^0.160.0"
   },
   "devDependencies": {
-    "@types/three": "^0.160.0",
     "@threejs-addons/types": "^0.1.0",
+    "@types/three": "^0.160.0",
     "typedoc": "^0.25.4"
   }
 }

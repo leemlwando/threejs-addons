@@ -1,4 +1,4 @@
-import { Scene, PerspectiveCamera } from 'three';
+import * as THREE from 'three';
 import { Vector3 } from 'three/src/math/Vector3';
 import { generateUUID } from 'three/src/math/MathUtils';
 import { CameraControlType, CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types';
@@ -26,9 +26,9 @@ export class CameraController {
     loopControlTypeIndex: boolean = true;
 
     /** scene */
-    scene: Scene | null = null 
+    scene: THREE.Scene | null = null 
 
-    constructor(args: { scene: Scene }){
+    constructor(args: { scene: THREE.Scene }){
         if(args.scene !== null){
             this.scene = args.scene
         }
@@ -93,7 +93,7 @@ export class CameraController {
         if(!args) throw new Error('no options passed to configure');
 
         const controls: (OrbitControlsWrapper | PointerLockControlsWrapper)[] = [];
-        const camera = args.camera as PerspectiveCamera;
+        const camera = args.camera as THREE.PerspectiveCamera;
 
 
         /** add camera to scene */
@@ -221,7 +221,7 @@ export class CameraController {
     /** calls updateProjectionMatrix on current active camera */
     updateProjectionMatrix(): void{
         if(!this.activeController)return;
-        let c = this.activeController.camera as PerspectiveCamera
+        let c = this.activeController.camera as THREE.PerspectiveCamera
         c.updateProjectionMatrix();
     }
 
