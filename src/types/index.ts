@@ -1,5 +1,5 @@
 import { Camera, PerspectiveCamera } from 'three';
-import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../wrappers';
+import { OrbitControlsWrapper, PointerLockControlsWrapper } from './wrappers';
 
 export type Index = number;
 

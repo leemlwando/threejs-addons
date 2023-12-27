@@ -1,0 +1,23 @@
+{
+  "name": "@threejs-addons/types",
+  "version": "0.1.0",
+  "description": "Typescript definitions for threejs-addons",
+  "main": "index.d.ts",
+  "types": "index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leemlwando/ThreeJS-Addons.git#main"
+  },
+  "keywords": [
+    "THREEJS-ADDONS-TYPES"
+  ],
+  "author": "Lee M. Lwando <leemlwando@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leemlwando/ThreeJS-Addons/issues"
+  },
+  "homepage": "https://github.com/leemlwando/ThreeJS-Addons/tree/main#readme"
+}

@@ -2,7 +2,7 @@
   "name": "threejs-addons",
   "version": "0.1.0",
   "description": "free & opensource threejs addons to boost productivity",
-  "main": "lib/index.js",
+  "main": "build/index.js",
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,14 +23,16 @@
   "author": "Lee M. Lwando <leemlwando@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/leemlwando/ThreeJS-Addons/issues"
+    "url": "https://github.com/leemlwando/threejs-addons/issues"
   },
-  "homepage": "https://github.com/leemlwando/ThreeJS-Addons#readme",
+  "homepage": "https://github.com/leemlwando/threejs-addons#readme",
   "dependencies": {
+
     "three": "^0.160.0"
   },
   "devDependencies": {
     "@types/three": "^0.160.0",
+    "@threejs-addons/types": "^0.1.0",
     "typedoc": "^0.25.4"
   }
 }
