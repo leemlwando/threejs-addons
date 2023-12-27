@@ -83,7 +83,7 @@ function animate() {
 
     if(!cameraController.activeController)return;
     
-    viewer.renderer.render(viewer.scene, cameraController.activeController?.camera);
+    renderer.render(viewer.scene, cameraController.activeController.camera);
 }
 ```
 
