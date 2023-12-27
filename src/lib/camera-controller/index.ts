@@ -3,6 +3,7 @@ import { Vector3 } from 'three/src/math/Vector3';
 import { generateUUID } from 'three/src/math/MathUtils';
 import { CameraControlType, CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types';
 import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../wrappers';
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 
 
 /**
@@ -91,52 +92,59 @@ export class CameraController {
 
         if(!args) throw new Error('no options passed to configure');
 
-        const controller: CameraControllerType = { 
-            camera: args.camera as PerspectiveCamera,
-            controls: [],
-            active: args.active
-        }
+        const controls: (OrbitControlsWrapper | PointerLockControlsWrapper)[] = [];
+        const camera = args.camera as PerspectiveCamera;
+
 
         /** add camera to scene */
 
         if(this.scene !== null){
-            this.scene.add(controller.camera);
+            this.scene.add(camera);
         }
 
         /** configure camera */
-        controller.camera.aspect = window.innerWidth/window.innerHeight;
-        controller.camera.fov = 75;
-        controller.camera.updateProjectionMatrix();
+        camera.aspect = window.innerWidth/window.innerHeight;
+        camera.fov = 75;
+        camera.updateProjectionMatrix();
 
         for(const control of  args.controls){
 
             if(control.type === ControlType.ORBIT_CONTROLS){
 
-            const orbitControls = new OrbitControlsWrapper( args.camera, args.domElement );
+            const orbitControls = new OrbitControlsWrapper( camera, args.domElement );
 
             for(const option in control.options){
-                orbitControls[option] = control.options[option];
+                (orbitControls as any)[option] = control.options[option];
             }
 
             orbitControls.userData = { uuid: generateUUID(), type: ControlType.ORBIT_CONTROLS, active: false };
 
-            controller.controls.push(orbitControls);
+            controls.push(orbitControls);
 
             }
 
             if(control.type === ControlType.POINTER_LOCK_CONTROLS){
 
-            const pointerControls = new PointerLockControlsWrapper( args.camera, args.domElement );
+            const pointerControls = new PointerLockControlsWrapper( camera, args.domElement );
 
             for(const option in control.options){
-                pointerControls[option] = control.options[option];
+                (pointerControls as any)[option] = control.options[option];
             }
 
             pointerControls.userData = { uuid: generateUUID(), type: ControlType.POINTER_LOCK_CONTROLS, active: false };
 
-            controller.controls.push(pointerControls);
+            controls.push(pointerControls);
 
             }
+        }
+
+        const controller: CameraControllerType = { 
+            uuid: generateUUID(), 
+            camera, 
+            controls, 
+            active: args.active,
+            disable: () => this.disableControlsByControllerIndex(this.currentControllerIndex),
+            enable: () => this.enableActiveControllerControl(this.getCurrentActiveControlType())
         }
 
         this.controllers.push(controller);
@@ -159,9 +167,11 @@ export class CameraController {
             this.activeController.camera.aspect = window.innerWidth/window.innerHeight;
             this.updateProjectionMatrix();
 
-            this.activeController.controls.forEach(control => {
+            this.activeController.controls.forEach((control: OrbitControlsWrapper | PointerLockControlsWrapper) => {
 
-                if(control.userData.type === ControlType.ORBIT_CONTROLS){
+                if(!control.userData) return;
+
+                if('enabled' in control && control.userData.type === ControlType.ORBIT_CONTROLS){
                     control.userData.active = true;
                     control.enabled = true;
                     control.update()
@@ -179,18 +189,24 @@ export class CameraController {
         this.activeController.camera.aspect = window.innerWidth/window.innerHeight;
         this.updateProjectionMatrix();
 
-        previouslyActiveController.controls.forEach(control => control.userData.active = false );
+        previouslyActiveController.controls.forEach((control: OrbitControlsWrapper | PointerLockControlsWrapper) => {
+            if(!control.userData) return;
+            control.userData.active = false
+        });
 
-        this.activeController?.controls.forEach(control => control.userData.active = !activeControlType ? control.userData.type === ControlType.ORBIT_CONTROLS : control.userData.type === activeControlType);
+        this.activeController?.controls.forEach((control: OrbitControlsWrapper | PointerLockControlsWrapper) => {
+            if(!control.userData) return;
+            control.userData.active = !activeControlType ? control.userData.type === ControlType.ORBIT_CONTROLS : control.userData.type === activeControlType
+        });
 
     }
 
     /** get active control type */
     getCurrentActiveControlType(): ControlType.ORBIT_CONTROLS | ControlType.POINTER_LOCK_CONTROLS | null {
 
-       let activeControl = this.activeController?.controls.find(control => control.userData.active === true)
+       let activeControl = this.activeController?.controls.find((control: OrbitControlsWrapper | PointerLockControlsWrapper ) => control.userData && control.userData.active === true)
 
-       if(!activeControl) return null;
+       if(!activeControl?.userData) return null;
 
        return activeControl?.userData.type;
     }
@@ -233,7 +249,7 @@ export class CameraController {
     }
 
     /** enable active controllers control by activeControlType */
-    private enableActiveControllerControl(activeControlType: CameraControlType ): void {
+    private enableActiveControllerControl(activeControlType: CameraControlType | null ): void {
 
         if(!this.activeController)return;
 
@@ -262,7 +278,7 @@ export class CameraController {
 
         if(previousControlTypeIndex === null || previousControlTypeIndex === undefined) return;
 
-        let prevControl  = this.activeController.controls[ previousControlTypeIndex ] as OrbitControlsWrapper | PointerLockControlsWrapper;
+        let prevControl  = this.activeController.controls[ previousControlTypeIndex ] as OrbitControlsWrapper & (PointerLockControlsWrapper & PointerLockControls);
 
         if(!prevControl) return;
 

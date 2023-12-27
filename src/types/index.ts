@@ -19,10 +19,16 @@ export type UserData = {
     active: boolean
 }
 
+export type CameraControlUserData = {
+    uuid: string,
+    type: ControlType.ORBIT_CONTROLS | ControlType.POINTER_LOCK_CONTROLS
+    active: boolean
+}
+
 export type CameraControllerType = { 
     uuid: string,  
     camera: PerspectiveCamera, 
-    controls: [ OrbitControlsWrapper | PointerLockControlsWrapper ]
+    controls: (OrbitControlsWrapper | PointerLockControlsWrapper)[]
     active: boolean, 
     disable: Function, 
     enable: Function 
