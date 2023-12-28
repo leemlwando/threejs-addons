@@ -1,52 +1,18 @@
-import * as THREE from 'three';
 import { Vector3 } from 'three/src/math/Vector3';
-import { Vector4 } from 'three/src/math/Vector4';
-import { Quaternion } from 'three/src/math/Quaternion'
-import * as RAPIER from '@dimforge/rapier3d-compat';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
-import { TargetObject } from '../../types/translation';
 import { CameraControllerType, ControlType } from '../../types';
 import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../types/wrappers';
-import { BaseController } from './controller';
+import { BaseController } from './Base';
 import { RapierColliderController } from './rapier-character-controller';
-import { CameraController } from './camera';
+import { CameraController } from './camera-controller';
 
-interface TranslationControllerAPI {
-    RCC: RapierColliderController;
-    CCC: CameraController;
-    setRCC(RCC: RapierColliderController): void;
-    setCCC(CCC: CameraController): void;
+export class TranslationController extends BaseController {
 
-}
-
-export class TranslationController extends BaseController implements TranslationControllerAPI {
-
-    RCC: RapierColliderController;
-    CCC: CameraController;
-
-    constructor({ options, RCC, CCC }: { options: object, RCC: RapierColliderController, CCC: CameraController }){
-        super({ target: null, options });
-        this.RCC = RCC;
-        this.CCC = CCC;
-
+    constructor({ options, RCC, CCC, TCC }: { options: object, RCC?: RapierColliderController, CCC?: CameraController, TCC?: TranslationController }){
+        super({ target: null, options, CCC, RCC, TCC });
     }
 
-    /** 
-     * @description setup rapier coontroller class instance 
-     * @param RCC RapierColliderController
-    */
-    setRCC(RCC: RapierColliderController){
-        this.RCC = RCC;
-    }
-
-    /** 
-     * @description setup up camera controller class instance
-     * @param CCC CameraController 
-     * */
-    setCCC(CCC: CameraController){
-        this.CCC = CCC;
-    }
 
     private translateOrbitControls(): void {
 
@@ -67,7 +33,7 @@ export class TranslationController extends BaseController implements Translation
             delta: this.delta,
             direction: this.direction,
             translation: new Vector3(px, py, pz),
-            cameraController: this.cameraController as CameraControllerType
+            cameraController: this.CCC?.activeController as CameraControllerType
         });
 
         if(!computedTranslation) return;
@@ -155,12 +121,13 @@ export class TranslationController extends BaseController implements Translation
     }
 
     /** handle simulation */
-    update(delta: number){
+    update(delta: number, updateRCC: boolean){
         this.delta = delta;
-        this.velocity.x -= this.velocity.x * this.SLOW_DOWN_CONSTANT * this.delta;
-		this.velocity.z -= this.velocity.z * this.SLOW_DOWN_CONSTANT * this.delta;
+        // this.velocity.x -= this.velocity.x * this.SLOW_DOWN_CONSTANT * this.delta;
+		// this.velocity.z -= this.velocity.z * this.SLOW_DOWN_CONSTANT * this.delta;
 
         if(this.RCC){
+            if(updateRCC === true) this.RCC.update(delta);
             this.translateXDirection = this.RCC.translateXDirection;
             this.translateZDirection = this.RCC.translateZDirection;
             this.translateXYZDirection = this.RCC.translateXYZDirection;
@@ -173,7 +140,7 @@ export class TranslationController extends BaseController implements Translation
     /** get orbit controls */
 
     private getOrbitControls(controller?: CameraControllerType | undefined ) : OrbitControlsWrapper & OrbitControls | null {
-        const cameraController = controller || this.cameraController;
+        const cameraController = controller || this.CCC?.activeController;
         if(!cameraController) return null;
         const orbitControls: OrbitControls & OrbitControlsWrapper = cameraController.controls.find((control: OrbitControlsWrapper | PointerLockControlsWrapper) => control.userData && control.userData.type === ControlType.ORBIT_CONTROLS) as OrbitControls & OrbitControlsWrapper;
         if(!orbitControls)return null;
@@ -181,7 +148,7 @@ export class TranslationController extends BaseController implements Translation
     } 
     
     private getPointLockControls(controller?: CameraControllerType | undefined) : PointerLockControlsWrapper | null {
-        const cameraController = controller || this.cameraController;
+        const cameraController = controller || this.CCC?.activeController;
         if(!cameraController) return null;
         const pointerLockControls: PointerLockControls & PointerLockControlsWrapper = cameraController.controls.find((control: OrbitControlsWrapper | PointerLockControlsWrapper) => control.userData && control.userData.type === ControlType.POINTER_LOCK_CONTROLS) as PointerLockControls & PointerLockControlsWrapper;
         if(!pointerLockControls)return null;
@@ -189,7 +156,8 @@ export class TranslationController extends BaseController implements Translation
     }
     
     getCameraControllerActiveControlType(): ControlType.ORBIT_CONTROLS | ControlType.POINTER_LOCK_CONTROLS | null {
-        const control = this.cameraController?.controls.find((control: (OrbitControlsWrapper | PointerLockControlsWrapper)) => control.userData && control.userData.active === true);
+        if(!this.CCC?.activeController) return null;
+        const control = this.CCC.activeController?.controls.find((control: (OrbitControlsWrapper | PointerLockControlsWrapper)) => control.userData && control.userData.active === true);
         if(!control?.userData) return null;
         return control?.userData.type
     }

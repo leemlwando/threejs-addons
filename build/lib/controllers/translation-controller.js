@@ -3,10 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TranslationController = void 0;
 const Vector3_1 = require("three/src/math/Vector3");
 const types_1 = require("../../types");
-const controller_1 = require("./controller");
-class TranslationController extends controller_1.BaseController {
-    constructor({ options, RCC, CCC }) {
-        super({ target: null, options, CCC, RCC });
+const Base_1 = require("./Base");
+class TranslationController extends Base_1.BaseController {
+    constructor({ options, RCC, CCC, TCC }) {
+        super({ target: null, options, CCC, RCC, TCC });
     }
     translateOrbitControls() {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
@@ -19,7 +19,7 @@ class TranslationController extends controller_1.BaseController {
             return;
         }
         const { x: px, y: py, z: pz } = orbitControls.object.position;
-        const computedTranslation = controller_1.BaseController.computeTranslationXYZDirection({
+        const computedTranslation = Base_1.BaseController.computeTranslationXYZDirection({
             SPEED_UP_CONSTANT: this.SPEED_UP_CONSTANT,
             delta: this.delta,
             direction: this.direction,
@@ -57,7 +57,7 @@ class TranslationController extends controller_1.BaseController {
             return;
         }
         const { x: px, y: py, z: pz } = pointerLockControls.camera.position;
-        const computedTranslation = controller_1.BaseController.computeTranslationXYZDirection({
+        const computedTranslation = Base_1.BaseController.computeTranslationXYZDirection({
             SPEED_UP_CONSTANT: this.SPEED_UP_CONSTANT,
             delta: this.delta,
             direction: this.direction,
@@ -128,12 +128,14 @@ class TranslationController extends controller_1.BaseController {
         return pointerLockControls;
     }
     getCameraControllerActiveControlType() {
-        var _a;
-        const control = (_a = this.CCC.activeController) === null || _a === void 0 ? void 0 : _a.controls.find((control) => control.userData && control.userData.active === true);
+        var _a, _b;
+        if (!((_a = this.CCC) === null || _a === void 0 ? void 0 : _a.activeController))
+            return null;
+        const control = (_b = this.CCC.activeController) === null || _b === void 0 ? void 0 : _b.controls.find((control) => control.userData && control.userData.active === true);
         if (!(control === null || control === void 0 ? void 0 : control.userData))
             return null;
         return control === null || control === void 0 ? void 0 : control.userData.type;
     }
 }
 exports.TranslationController = TranslationController;
-//# sourceMappingURL=translation.js.map
+//# sourceMappingURL=translation-controller.js.map

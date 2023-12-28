@@ -1,16 +1,17 @@
-import RAPIER from "@dimforge/rapier3d-compat";
 import { Vector3 } from 'three/src/math/Vector3';
 import { Quaternion } from 'three/src/math/Quaternion';
 import { calculateVelocity } from "../../utils/helpers";
 import { CameraControllerType } from "../../types";
-import { TranslationController } from "./translation";
+import { TranslationController } from "./translation-controller";
+import { RapierColliderController } from "./rapier-character-controller";
+import { CameraController } from "./camera-controller";
 
 interface ControllerAPI {
     options: any;
     target: any;
     _target: any;
     setTarget(target: any): void;
-    update(delta: number): void;
+    update(delta: number, updateController?: boolean): void;
     translateXDirection: boolean;
     setTranslateXDirection(state: boolean, value: number): void;
     handleTranslateXDirection(): void;
@@ -33,8 +34,14 @@ interface ControllerAPI {
     desiredMovementVector: Vector3;
     desiredVelocityVector: Vector3;
     cameraController?: CameraControllerType;
+
+    RCC?: RapierColliderController;
+    CCC?: CameraController;
+    TCC?: TranslationController;
+    setRCC(RCC: RapierColliderController): void;
+    setCCC(CCC: CameraController): void;
+    setTCC(TCC: TranslationController): void;
     /** static methods */
-    //computeTranslationXDirection(self: any): Vector3;
 }
 
 export class BaseController implements ControllerAPI {
@@ -56,10 +63,43 @@ export class BaseController implements ControllerAPI {
     desiredVelocityVector: Vector3 = new Vector3(0,0,0);
     cameraController?: CameraControllerType;
 
-    constructor({ target, options }: { target: any, options: object }) {
+    RCC?: RapierColliderController;
+    CCC?: CameraController;
+    TCC?: TranslationController;
+    
+
+    constructor({ CCC, RCC, TCC, target, options }: { target: any, options: object, CCC?: CameraController, RCC?: RapierColliderController, TCC?: TranslationController }) {
         if(target) this.setTarget(target);
         if(options) this.options = options;
+        if(CCC) this.setCCC(CCC);
+        if(RCC) this.setRCC(RCC);
+        if(TCC) this.setTCC(TCC);
     }
+
+    /** 
+     * @description setup rapier coontroller class instance 
+     * @param RCC RapierColliderController
+    */
+    setRCC(RCC: RapierColliderController){
+        this.RCC = RCC;
+    }
+    
+    /** 
+     * @description setup up camera controller class instance
+     * @param CCC CameraController 
+     * */
+    setCCC(CCC: CameraController){
+        this.CCC = CCC;
+    }
+
+    /** 
+     * @description setup up translation controller class instance
+     * @param TCC TranslationController 
+     * */
+    setTCC(TCC: TranslationController){
+        this.TCC = TCC;
+    }
+    
 
     /**
      * @description sets camera controller
@@ -189,9 +229,9 @@ export class BaseController implements ControllerAPI {
     /**
      * @description updates the controller
      */
-    update(delta: number) {
+    update(delta: number, updateController?: boolean) {
         this.delta = delta;
-        this.resetVelocity(); //reset on every tick
+        // this.resetVelocity(); //reset on every tick
         if(this.translateXDirection || this.translateYDirection || this.translateZDirection || this.translateXYZDirection) return this.handleTranslateXYZDirection();
         // if(this.translateXDirection) return this.handleTranslateXDirection();
         // if(this.translateYDirection) return this.handleTranslateYDirection();

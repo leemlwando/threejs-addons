@@ -1,4 +1,5 @@
-import { Camera, PerspectiveCamera } from 'three';
+import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
+import { Camera } from 'three/src/cameras/Camera';
 import { OrbitControlsWrapper, PointerLockControlsWrapper } from './wrappers';
 export type Index = number;
 export declare enum ControlType {

@@ -1,5 +1,6 @@
 import * as RAPIER from '@dimforge/rapier3d-compat';
-import { BaseController } from './controller';
+import { BaseController } from './Base';
+import { CameraController } from './camera-controller';
 interface RapierColliderControllerAPI {
     world: RAPIER.World;
     offset: number;
@@ -13,7 +14,13 @@ export declare class RapierColliderController extends BaseController implements 
     controller: RAPIER.KinematicCharacterController;
     collider: RAPIER.Collider | null;
     toi: number;
-    constructor(world: RAPIER.World, offset: number, options: object);
+    constructor({ world, offset, options, RCC, CCC }: {
+        world: RAPIER.World;
+        offset: number;
+        options: object;
+        RCC: RapierColliderController;
+        CCC: CameraController;
+    });
     /**
      * @description sets up the character controller
      * @returns CharacterController

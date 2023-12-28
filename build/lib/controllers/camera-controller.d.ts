@@ -1,9 +1,36 @@
-import * as THREE from 'three';
+import { Scene } from 'three/src/scenes/Scene';
 import { CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types';
+interface CameraControllerAPI {
+    /** controllers */
+    controllers: CameraControllerType[];
+    activeController: CameraControllerType | null;
+    /** configurations */
+    loopControllerIndex: boolean;
+    /** track controllers */
+    currentControllerIndex: Index;
+    previousControllerIndex: Index | null;
+    /** track controls */
+    currentControlTypeIndex: Index;
+    previousControlTypeIndex: Index | null;
+    loopControlTypeIndex: boolean;
+    /** scene */
+    scene?: Scene | undefined;
+    /** methods */
+    switchControllerNext(index: Index | null): Index | null;
+    switchControlTypeNext(index: Index | null): Index;
+    configureController(args: configureControllerArgsType): void;
+    setActiveController(index: Index, disableCurrentController: boolean): void;
+    getCurrentActiveControlType(): ControlType.ORBIT_CONTROLS | ControlType.POINTER_LOCK_CONTROLS | null;
+    onResize({ width, height }: {
+        width: number;
+        height: number;
+    }): void;
+    updateProjectionMatrix(): void;
+}
 /**
  * @description CameraController class for managing camera and its respective controls.
  */
-export declare class CameraController {
+export declare class CameraController implements CameraControllerAPI {
     controllers: CameraControllerType[];
     activeController: CameraControllerType | null;
     /**confgurations */
@@ -16,9 +43,9 @@ export declare class CameraController {
     previousControlTypeIndex: Index | null;
     loopControlTypeIndex: boolean;
     /** scene */
-    scene?: THREE.Scene | undefined;
+    scene?: Scene | undefined;
     constructor(args: {
-        scene?: THREE.Scene;
+        scene?: Scene;
     });
     /** switch controllers */
     switchControllerNext(index: Index | null): Index | null;
@@ -44,3 +71,4 @@ export declare class CameraController {
     /** toggle Control By index */
     private toggleControlTypeByIndex;
 }
+export {};

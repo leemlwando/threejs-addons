@@ -245,4 +245,4 @@ class CameraController {
     }
 }
 exports.CameraController = CameraController;
-//# sourceMappingURL=camera.js.map
+//# sourceMappingURL=camera-controller.js.map

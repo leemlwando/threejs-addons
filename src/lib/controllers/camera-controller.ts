@@ -1,15 +1,46 @@
-import * as THREE from 'three';
+import { Scene } from 'three/src/scenes/Scene';
+import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { Vector3 } from 'three/src/math/Vector3';
 import { generateUUID } from 'three/src/math/MathUtils';
 import { CameraControlType, CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types';
 import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../wrappers';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 
+interface CameraControllerAPI {
+
+    /** controllers */
+    controllers: CameraControllerType[];
+    activeController: CameraControllerType | null;
+
+    /** configurations */
+    loopControllerIndex: boolean;
+
+    /** track controllers */
+    currentControllerIndex: Index;
+    previousControllerIndex: Index | null;
+
+    /** track controls */
+    currentControlTypeIndex: Index;
+    previousControlTypeIndex: Index | null;
+    loopControlTypeIndex: boolean;
+
+    /** scene */
+    scene?: Scene | undefined;
+
+    /** methods */
+    switchControllerNext(index: Index | null): Index | null;
+    switchControlTypeNext(index: Index | null): Index;
+    configureController(args: configureControllerArgsType): void;
+    setActiveController(index: Index, disableCurrentController: boolean): void;
+    getCurrentActiveControlType(): ControlType.ORBIT_CONTROLS | ControlType.POINTER_LOCK_CONTROLS | null;
+    onResize({ width, height }: { width: number, height: number }): void;
+    updateProjectionMatrix(): void;
+}
 
 /**
  * @description CameraController class for managing camera and its respective controls.
  */
-export class CameraController {
+export class CameraController implements CameraControllerAPI {
     controllers: CameraControllerType[] = [];
     activeController: CameraControllerType | null = null;
 
@@ -26,9 +57,9 @@ export class CameraController {
     loopControlTypeIndex: boolean = true;
 
     /** scene */
-    scene: THREE.Scene | null = null 
+    scene?: Scene | undefined = undefined; 
 
-    constructor(args: { scene: THREE.Scene }){
+    constructor(args: { scene?: Scene }){
         if(args.scene !== null){
             this.scene = args.scene
         }
@@ -93,12 +124,12 @@ export class CameraController {
         if(!args) throw new Error('no options passed to configure');
 
         const controls: (OrbitControlsWrapper | PointerLockControlsWrapper)[] = [];
-        const camera = args.camera as THREE.PerspectiveCamera;
+        const camera = args.camera as PerspectiveCamera;
 
 
         /** add camera to scene */
 
-        if(this.scene !== null){
+        if(this.scene !== undefined){
             this.scene.add(camera);
         }
 
@@ -221,7 +252,7 @@ export class CameraController {
     /** calls updateProjectionMatrix on current active camera */
     updateProjectionMatrix(): void{
         if(!this.activeController)return;
-        let c = this.activeController.camera as THREE.PerspectiveCamera
+        let c = this.activeController.camera as PerspectiveCamera
         c.updateProjectionMatrix();
     }
 

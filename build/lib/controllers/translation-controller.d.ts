@@ -1,12 +1,13 @@
 import { ControlType } from '../../types';
-import { BaseController } from './controller';
+import { BaseController } from './Base';
 import { RapierColliderController } from './rapier-character-controller';
-import { CameraController } from './camera';
+import { CameraController } from './camera-controller';
 export declare class TranslationController extends BaseController {
-    constructor({ options, RCC, CCC }: {
+    constructor({ options, RCC, CCC, TCC }: {
         options: object;
-        RCC: RapierColliderController;
-        CCC: CameraController;
+        RCC?: RapierColliderController;
+        CCC?: CameraController;
+        TCC?: TranslationController;
     });
     private translateOrbitControls;
     private translatePointerLockControls;

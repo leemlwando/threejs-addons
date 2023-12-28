@@ -1,8 +1,9 @@
 import * as RAPIER from '@dimforge/rapier3d-compat';
-import { BaseController } from './controller';
+import { BaseController } from './Base';
 import { Vector3 } from 'three/src/math/Vector3';
 import { Quaternion } from 'three/src/math/Quaternion';
 import { CameraControllerType } from '../../types';
+import { CameraController } from './camera-controller';
 
 interface RapierColliderControllerAPI {
    world: RAPIER.World;
@@ -19,8 +20,8 @@ export class RapierColliderController extends BaseController implements RapierCo
     collider: RAPIER.Collider | null = null;
     toi: number = 0;
     
-    constructor(world: RAPIER.World, offset: number, options: object){
-        super({ target: null, options });
+    constructor({ world, offset, options, RCC, CCC } : { world: RAPIER.World, offset: number, options: object, RCC: RapierColliderController, CCC: CameraController }){
+        super({ target: null, options, RCC, CCC });
         this.world = world;
         this.offset = offset;
         this.controller = this.initCharacterController();
@@ -121,7 +122,7 @@ export class RapierColliderController extends BaseController implements RapierCo
             delta: this.delta,
             direction: this.direction,
             translation: new Vector3(cx, cy, cz),
-            cameraController: this.cameraController as CameraControllerType
+            cameraController: this.CCC?.activeController as CameraControllerType
         });
 
         if(!computedTranslation) return;
@@ -187,8 +188,8 @@ export class RapierColliderController extends BaseController implements RapierCo
     /** set collider quartenion */
     setColliderQuaternionFromCameraController(){
         if(!this.collider) return;
-        if(!this.cameraController) return;
-        this.collider.setRotation({ x: this.cameraController?.camera.quaternion.x as number, y: this.cameraController?.camera.quaternion.y as number, z: this.cameraController?.camera.quaternion.z as number, w: this.cameraController?.camera.quaternion.w as number});
+        if(!this.CCC?.activeController) return;
+        this.collider.setRotation({ x: this.CCC.activeController?.camera.quaternion.x as number, y: this.CCC.activeController?.camera.quaternion.y as number, z: this.CCC.activeController?.camera.quaternion.z as number, w: this.CCC.activeController?.camera.quaternion.w as number});
     }
 
     updateColliderPosition(): void {
