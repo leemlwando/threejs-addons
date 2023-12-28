@@ -138,4 +138,3 @@ class TranslationController extends Base_1.BaseController {
     }
 }
 exports.TranslationController = TranslationController;
-//# sourceMappingURL=translation-controller.js.map

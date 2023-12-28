@@ -18,4 +18,3 @@ const calculateVelocity = ({ direction, delta, SPEED_UP_CONSTANT }) => {
     return velocity;
 };
 exports.calculateVelocity = calculateVelocity;
-//# sourceMappingURL=helpers.js.map

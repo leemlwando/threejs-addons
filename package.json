@@ -1,6 +1,6 @@
 {
   "name": "@threejs-addons/threejs-addons",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "free & opensource threejs addons to boost productivity",
   "main": "build/index.js",
   "scripts": {
@@ -20,7 +20,9 @@
     "TRANSLATION-CONTROLLER",
     "CAMERA-CONTROLLER",
     "TRANSLATION",
-    "OBJECT"
+    "OBJECT",
+    "COLLISION DETECTION",
+    "CHARACTER CONTROLLER"
   ],
   "author": "Lee M. Lwando <leemlwando@gmail.com>",
   "license": "MIT",
@@ -30,7 +32,6 @@
   "homepage": "https://github.com/leemlwando/threejs-addons#readme",
   "dependencies": {
     "@dimforge/rapier3d": "^0.11.2",
-    "@dimforge/rapier3d-compat": "^0.11.2",
     "three": "^0.160.0"
   },
   "devDependencies": {

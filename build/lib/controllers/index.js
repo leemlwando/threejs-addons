@@ -17,4 +17,3 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./rapier-character-controller"), exports);
 __exportStar(require("./translation-controller"), exports);
 __exportStar(require("./camera-controller"), exports);
-//# sourceMappingURL=index.js.map

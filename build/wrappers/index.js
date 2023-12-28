@@ -17,4 +17,3 @@ class PointerLockControlsWrapper extends PointerLockControls_1.PointerLockContro
     }
 }
 exports.PointerLockControlsWrapper = PointerLockControlsWrapper;
-//# sourceMappingURL=index.js.map

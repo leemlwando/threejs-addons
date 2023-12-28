@@ -1,21 +1,21 @@
-import * as RAPIER from '@dimforge/rapier3d-compat';
+import { World, KinematicCharacterController, Collider } from '@dimforge/rapier3d';
 import { BaseController } from './Base';
 import { CameraController } from './camera-controller';
 interface RapierColliderControllerAPI {
-    world: RAPIER.World;
+    world: World;
     offset: number;
-    controller: RAPIER.KinematicCharacterController;
-    collider: RAPIER.Collider | null;
+    controller: KinematicCharacterController;
+    collider: Collider | null;
     toi: number;
 }
 export declare class RapierColliderController extends BaseController implements RapierColliderControllerAPI {
-    world: RAPIER.World;
+    world: World;
     offset: number;
-    controller: RAPIER.KinematicCharacterController;
-    collider: RAPIER.Collider | null;
+    controller: KinematicCharacterController;
+    collider: Collider | null;
     toi: number;
     constructor({ world, offset, options, RCC, CCC }: {
-        world: RAPIER.World;
+        world: World;
         offset: number;
         options: object;
         RCC: RapierColliderController;
@@ -50,7 +50,7 @@ export declare class RapierColliderController extends BaseController implements 
      * @param updateTargetPosition Wether or not to update the target position. This forces the controller to try and update target position even if the collider is null
      * @description sets the collider
      */
-    setCollider(collider: RAPIER.Collider, updateTargetPosition?: boolean): void;
+    setCollider(collider: Collider, updateTargetPosition?: boolean): void;
     /** @description handle XYZ movements */
     handleTranslateXYZDirection(): void;
     /**

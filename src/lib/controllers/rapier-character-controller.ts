@@ -1,4 +1,4 @@
-import * as RAPIER from '@dimforge/rapier3d-compat';
+import { World, KinematicCharacterController, Collider, CharacterCollision, QueryFilterFlags } from '@dimforge/rapier3d';
 import { BaseController } from './Base';
 import { Vector3 } from 'three/src/math/Vector3';
 import { Quaternion } from 'three/src/math/Quaternion';
@@ -6,21 +6,21 @@ import { CameraControllerType } from '../../types';
 import { CameraController } from './camera-controller';
 
 interface RapierColliderControllerAPI {
-   world: RAPIER.World;
+   world: World;
    offset: number;
-   controller: RAPIER.KinematicCharacterController;
-   collider: RAPIER.Collider | null;
+   controller: KinematicCharacterController;
+   collider: Collider | null;
    toi: number;
 }
 
 export class RapierColliderController extends BaseController implements RapierColliderControllerAPI {
-    world: RAPIER.World;
+    world: World;
     offset: number;
-    controller: RAPIER.KinematicCharacterController;
-    collider: RAPIER.Collider | null = null;
+    controller: KinematicCharacterController;
+    collider: Collider | null = null;
     toi: number = 0;
     
-    constructor({ world, offset, options, RCC, CCC } : { world: RAPIER.World, offset: number, options: object, RCC: RapierColliderController, CCC: CameraController }){
+    constructor({ world, offset, options, RCC, CCC } : { world: World, offset: number, options: object, RCC: RapierColliderController, CCC: CameraController }){
         super({ target: null, options, RCC, CCC });
         this.world = world;
         this.offset = offset;
@@ -32,7 +32,7 @@ export class RapierColliderController extends BaseController implements RapierCo
      * @returns CharacterController
      */
     private initCharacterController(){
-       return this.world.createCharacterController(this.offset) as RAPIER.KinematicCharacterController;
+       return this.world.createCharacterController(this.offset) as KinematicCharacterController;
     }
 
     /**
@@ -41,11 +41,11 @@ export class RapierColliderController extends BaseController implements RapierCo
      * @returns number of collisions
      */
     private computeMovement({ collider, desiredMovementVector, filterFlags, filterGroups, filterPredicate } : { 
-        collider: RAPIER.Collider | null, 
-        desiredMovementVector: RAPIER.Vector, 
-        filterFlags?: RAPIER.QueryFilterFlags | undefined,
+        collider: Collider | null, 
+        desiredMovementVector: Vector3, 
+        filterFlags?: QueryFilterFlags | undefined,
         filterGroups?: number | undefined,
-        filterPredicate?: (collider: RAPIER.Collider) => boolean
+        filterPredicate?: (collider: Collider) => boolean
     }): null | number {
 
         let c = collider || this.collider;
@@ -63,12 +63,12 @@ export class RapierColliderController extends BaseController implements RapierCo
      * @description get computed collisions
      * @returns Array of collisions
      */
-    private getComputedCollisions(): RAPIER.CharacterCollision[] {
-        let collisions: RAPIER.CharacterCollision[] = [];
+    private getComputedCollisions(): CharacterCollision[] {
+        let collisions: CharacterCollision[] = [];
 
         for (let i = 0; i < this.controller.numComputedCollisions(); i++) {
             let collision = this.controller.computedCollision(i);
-            collisions.push(collision as RAPIER.CharacterCollision);
+            collisions.push(collision as CharacterCollision);
         }
 
         return collisions;
@@ -81,7 +81,7 @@ export class RapierColliderController extends BaseController implements RapierCo
         let is_collision_imminent = false;
 
         for (let i = 0; i < this.controller.numComputedCollisions(); i++) {
-            let collision = this.controller.computedCollision(i) as RAPIER.CharacterCollision;
+            let collision = this.controller.computedCollision(i) as CharacterCollision;
             if(collision.toi <= this.toi) is_collision_imminent = true;
         }
 
@@ -91,8 +91,9 @@ export class RapierColliderController extends BaseController implements RapierCo
     /**
      * @description get corrected movement
      */
-    private getCorrectedMovement(): RAPIER.Vector3 {
-        return this.controller.computedMovement();
+    private getCorrectedMovement(): Vector3 {
+        const { x, y, z } = this.controller.computedMovement();
+        return new Vector3(x, y, z);
     }
 
     /**
@@ -100,7 +101,7 @@ export class RapierColliderController extends BaseController implements RapierCo
      * @param updateTargetPosition Wether or not to update the target position. This forces the controller to try and update target position even if the collider is null
      * @description sets the collider
      */
-    setCollider(collider: RAPIER.Collider, updateTargetPosition?: boolean): void {
+    setCollider(collider: Collider, updateTargetPosition?: boolean): void {
         this.collider = collider;
 
         if(!this.target && !updateTargetPosition)return;

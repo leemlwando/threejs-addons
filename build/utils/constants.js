@@ -8,4 +8,3 @@ exports.OBJECT_TYPES = {
     POINTER_LOCK_CONTROLS: 'POINTER_LOCK_CONTROLS',
     ORBIT_CONTROLS: 'ORBIT_CONTROLS'
 };
-//# sourceMappingURL=constants.js.map

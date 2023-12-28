@@ -62,7 +62,8 @@ class RapierColliderController extends Base_1.BaseController {
      * @description get corrected movement
      */
     getCorrectedMovement() {
-        return this.controller.computedMovement();
+        const { x, y, z } = this.controller.computedMovement();
+        return new Vector3_1.Vector3(x, y, z);
     }
     /**
      * @param collider
@@ -172,4 +173,3 @@ class RapierColliderController extends Base_1.BaseController {
     }
 }
 exports.RapierColliderController = RapierColliderController;
-//# sourceMappingURL=rapier-character-controller.js.map
