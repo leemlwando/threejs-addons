@@ -5,6 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "build": "tsc",
+    "watch": "tsc --watch",
     "publish": "npm publish --access public",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
