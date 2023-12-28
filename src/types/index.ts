@@ -1,5 +1,6 @@
-import { Camera, PerspectiveCamera } from 'three';
-import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../wrappers';
+import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
+import { Camera } from 'three/src/cameras/Camera'
+import { OrbitControlsWrapper, PointerLockControlsWrapper } from './wrappers';
 
 export type Index = number;
 
@@ -19,10 +20,16 @@ export type UserData = {
     active: boolean
 }
 
+export type CameraControlUserData = {
+    uuid: string,
+    type: ControlType.ORBIT_CONTROLS | ControlType.POINTER_LOCK_CONTROLS
+    active: boolean
+}
+
 export type CameraControllerType = { 
     uuid: string,  
     camera: PerspectiveCamera, 
-    controls: [ OrbitControlsWrapper | PointerLockControlsWrapper ]
+    controls: (OrbitControlsWrapper | PointerLockControlsWrapper)[]
     active: boolean, 
     disable: Function, 
     enable: Function 

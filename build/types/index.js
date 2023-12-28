@@ -9,4 +9,3 @@ var ControlType;
     ControlType[ControlType["POINTER_LOCK_CONTROLS"] = 3] = "POINTER_LOCK_CONTROLS";
     ControlType[ControlType["ORBIT_CONTROLS"] = 4] = "ORBIT_CONTROLS";
 })(ControlType || (exports.ControlType = ControlType = {}));
-//# sourceMappingURL=index.js.map

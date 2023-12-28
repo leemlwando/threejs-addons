@@ -68,37 +68,42 @@ class CameraController {
     configureController(args) {
         if (!args)
             throw new Error('no options passed to configure');
-        const controller = {
-            camera: args.camera,
-            controls: [],
-            active: args.active
-        };
+        const controls = [];
+        const camera = args.camera;
         /** add camera to scene */
         if (this.scene !== null) {
-            this.scene.add(controller.camera);
+            this.scene.add(camera);
         }
         /** configure camera */
-        controller.camera.aspect = window.innerWidth / window.innerHeight;
-        controller.camera.fov = 75;
-        controller.camera.updateProjectionMatrix();
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.fov = 75;
+        camera.updateProjectionMatrix();
         for (const control of args.controls) {
             if (control.type === types_1.ControlType.ORBIT_CONTROLS) {
-                const orbitControls = new wrappers_1.OrbitControlsWrapper(args.camera, args.domElement);
+                const orbitControls = new wrappers_1.OrbitControlsWrapper(camera, args.domElement);
                 for (const option in control.options) {
                     orbitControls[option] = control.options[option];
                 }
                 orbitControls.userData = { uuid: (0, MathUtils_1.generateUUID)(), type: types_1.ControlType.ORBIT_CONTROLS, active: false };
-                controller.controls.push(orbitControls);
+                controls.push(orbitControls);
             }
             if (control.type === types_1.ControlType.POINTER_LOCK_CONTROLS) {
-                const pointerControls = new wrappers_1.PointerLockControlsWrapper(args.camera, args.domElement);
+                const pointerControls = new wrappers_1.PointerLockControlsWrapper(camera, args.domElement);
                 for (const option in control.options) {
                     pointerControls[option] = control.options[option];
                 }
                 pointerControls.userData = { uuid: (0, MathUtils_1.generateUUID)(), type: types_1.ControlType.POINTER_LOCK_CONTROLS, active: false };
-                controller.controls.push(pointerControls);
+                controls.push(pointerControls);
             }
         }
+        const controller = {
+            uuid: (0, MathUtils_1.generateUUID)(),
+            camera,
+            controls,
+            active: args.active,
+            disable: () => this.disableControlsByControllerIndex(this.currentControllerIndex),
+            enable: () => this.enableActiveControllerControl(this.getCurrentActiveControlType())
+        };
         this.controllers.push(controller);
     }
     /** set the active controller from your list of controllers */
@@ -113,8 +118,10 @@ class CameraController {
             this.activeController = this.controllers[this.currentControllerIndex];
             this.activeController.camera.aspect = window.innerWidth / window.innerHeight;
             this.updateProjectionMatrix();
-            this.activeController.controls.forEach(control => {
-                if (control.userData.type === types_1.ControlType.ORBIT_CONTROLS) {
+            this.activeController.controls.forEach((control) => {
+                if (!control.userData)
+                    return;
+                if ('enabled' in control && control.userData.type === types_1.ControlType.ORBIT_CONTROLS) {
                     control.userData.active = true;
                     control.enabled = true;
                     control.update();
@@ -126,14 +133,22 @@ class CameraController {
         this.activeController = this.controllers[this.currentControllerIndex];
         this.activeController.camera.aspect = window.innerWidth / window.innerHeight;
         this.updateProjectionMatrix();
-        previouslyActiveController.controls.forEach(control => control.userData.active = false);
-        (_a = this.activeController) === null || _a === void 0 ? void 0 : _a.controls.forEach(control => control.userData.active = !activeControlType ? control.userData.type === types_1.ControlType.ORBIT_CONTROLS : control.userData.type === activeControlType);
+        previouslyActiveController.controls.forEach((control) => {
+            if (!control.userData)
+                return;
+            control.userData.active = false;
+        });
+        (_a = this.activeController) === null || _a === void 0 ? void 0 : _a.controls.forEach((control) => {
+            if (!control.userData)
+                return;
+            control.userData.active = !activeControlType ? control.userData.type === types_1.ControlType.ORBIT_CONTROLS : control.userData.type === activeControlType;
+        });
     }
     /** get active control type */
     getCurrentActiveControlType() {
         var _a;
-        let activeControl = (_a = this.activeController) === null || _a === void 0 ? void 0 : _a.controls.find(control => control.userData.active === true);
-        if (!activeControl)
+        let activeControl = (_a = this.activeController) === null || _a === void 0 ? void 0 : _a.controls.find((control) => control.userData && control.userData.active === true);
+        if (!(activeControl === null || activeControl === void 0 ? void 0 : activeControl.userData))
             return null;
         return activeControl === null || activeControl === void 0 ? void 0 : activeControl.userData.type;
     }

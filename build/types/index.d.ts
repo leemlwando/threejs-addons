@@ -1,5 +1,6 @@
-import { Camera, PerspectiveCamera } from 'three';
-import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../wrappers';
+import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
+import { Camera } from 'three/src/cameras/Camera';
+import { OrbitControlsWrapper, PointerLockControlsWrapper } from './wrappers';
 export type Index = number;
 export declare enum ControlType {
     'OBJECT_3D' = 0,
@@ -14,10 +15,15 @@ export type UserData = {
     type: ControlType.OBJECT_3D | ControlType.ORBIT_CONTROLS | ControlType.POINTER_LOCK_CONTROLS | ControlType.RAPIER_COLLIDER | ControlType.RAPIER_RIGID_BODY;
     active: boolean;
 };
+export type CameraControlUserData = {
+    uuid: string;
+    type: ControlType.ORBIT_CONTROLS | ControlType.POINTER_LOCK_CONTROLS;
+    active: boolean;
+};
 export type CameraControllerType = {
     uuid: string;
     camera: PerspectiveCamera;
-    controls: [OrbitControlsWrapper | PointerLockControlsWrapper];
+    controls: (OrbitControlsWrapper | PointerLockControlsWrapper)[];
     active: boolean;
     disable: Function;
     enable: Function;
