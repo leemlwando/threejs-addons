@@ -15,4 +15,5 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./rapier-character-controller"), exports);
+__exportStar(require("./translation"), exports);
 //# sourceMappingURL=index.js.map

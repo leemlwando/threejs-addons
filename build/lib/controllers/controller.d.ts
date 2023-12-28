@@ -1,6 +1,7 @@
 import { Vector3 } from 'three/src/math/Vector3';
+import { Quaternion } from 'three/src/math/Quaternion';
 import { CameraControllerType } from "../../types";
-interface Controller {
+interface ControllerAPI {
     options: any;
     target: any;
     _target: any;
@@ -18,24 +19,32 @@ interface Controller {
     translateXYZDirection: boolean;
     setTranslateXYZDirection(state: boolean, direction: Vector3): void;
     handleTranslateXYZDirection(): void;
+    position: Vector3;
+    rotation: Quaternion;
+    velocity: Vector3;
     direction: Vector3;
     delta: number;
     SPEED_UP_CONSTANT: number;
+    SLOW_DOWN_CONSTANT: number;
     desiredMovementVector: Vector3;
     desiredVelocityVector: Vector3;
     cameraController?: CameraControllerType;
 }
-export declare class BaseController implements Controller {
+export declare class BaseController implements ControllerAPI {
     options: any;
     target: any;
+    _target: any;
     translateXDirection: boolean;
     translateYDirection: boolean;
     translateZDirection: boolean;
     translateXYZDirection: boolean;
     direction: Vector3;
+    position: Vector3;
+    rotation: Quaternion;
+    velocity: Vector3;
     delta: number;
-    _target: any;
     SPEED_UP_CONSTANT: number;
+    SLOW_DOWN_CONSTANT: number;
     desiredMovementVector: Vector3;
     desiredVelocityVector: Vector3;
     cameraController?: CameraControllerType;
@@ -64,7 +73,18 @@ export declare class BaseController implements Controller {
      * @returns
      */
     static computeTranslationXDirection(self: any): Vector3;
-    static computeTranslationXYZDirection(self: any): {
+    /**
+     *
+     * @param
+     * @returns
+     */
+    static computeTranslationXYZDirection({ translation, direction, SPEED_UP_CONSTANT, delta, cameraController }: {
+        translation: Vector3;
+        direction: Vector3;
+        SPEED_UP_CONSTANT: number;
+        delta: number;
+        cameraController?: CameraControllerType | undefined;
+    }): {
         position: Vector3;
         velocity: Vector3;
     } | null;
@@ -78,6 +98,7 @@ export declare class BaseController implements Controller {
      * @description sets the target of the controller
      */
     setTarget(target: any): void;
+    resetVelocity(): void;
     /**
      * @description updates the controller
      */

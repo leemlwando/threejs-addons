@@ -1,10 +1,11 @@
 import RAPIER from "@dimforge/rapier3d-compat";
 import { Vector3 } from 'three/src/math/Vector3';
+import { Quaternion } from 'three/src/math/Quaternion';
 import { calculateVelocity } from "../../utils/helpers";
 import { CameraControllerType } from "../../types";
 import { TranslationController } from "./translation";
 
-interface Controller {
+interface ControllerAPI {
     options: any;
     target: any;
     _target: any;
@@ -22,9 +23,13 @@ interface Controller {
     translateXYZDirection: boolean;
     setTranslateXYZDirection(state: boolean, direction: Vector3): void;
     handleTranslateXYZDirection(): void;
+    position: Vector3;
+    rotation: Quaternion;
+    velocity: Vector3;
     direction: Vector3;
     delta: number;
     SPEED_UP_CONSTANT: number;
+    SLOW_DOWN_CONSTANT: number;
     desiredMovementVector: Vector3;
     desiredVelocityVector: Vector3;
     cameraController?: CameraControllerType;
@@ -32,17 +37,21 @@ interface Controller {
     //computeTranslationXDirection(self: any): Vector3;
 }
 
-export class BaseController implements Controller {
+export class BaseController implements ControllerAPI {
     options: any;
     target: any;
+    _target: any;
     translateXDirection: boolean = false;
     translateYDirection: boolean = false;
     translateZDirection: boolean = false;
     translateXYZDirection: boolean = false;
     direction: Vector3 = new Vector3(0, 0, 0);
+    position: Vector3 = new Vector3(0, 0, 0);
+    rotation: Quaternion = new Quaternion(0, 0, 0, 0);
+    velocity: Vector3 = new Vector3(0, 0, 0);
     delta: number = 0;
-    _target: any;
     SPEED_UP_CONSTANT: number = 400;
+    SLOW_DOWN_CONSTANT: number = 10;
     desiredMovementVector: Vector3 = new Vector3(0,0,0);
     desiredVelocityVector: Vector3 = new Vector3(0,0,0);
     cameraController?: CameraControllerType;
@@ -50,8 +59,6 @@ export class BaseController implements Controller {
     constructor({ target, options }: { target: any, options: object }) {
         if(target) this.setTarget(target);
         if(options) this.options = options;
-
-        console.log('options', options)
     }
 
     /**
@@ -108,21 +115,22 @@ export class BaseController implements Controller {
         return position;
     }
 
-    static computeTranslationXYZDirection(self: any): { position: Vector3, velocity: Vector3 } | null {
+    /**
+     * 
+     * @param  
+     * @returns 
+     */
+    static computeTranslationXYZDirection({ translation, direction, SPEED_UP_CONSTANT, delta, cameraController  }: { translation: Vector3, direction: Vector3, SPEED_UP_CONSTANT: number,  delta: number, cameraController?: CameraControllerType | undefined }): { position: Vector3, velocity: Vector3 } | null {
 
-        // let position = new Vector3(self.target.position.x, self.target.position.y, self.target.position.z);
+        const { x, y, z } = translation;
 
-        if(!self.collider) return null;
-
-        const { x: cx, y: cy, z: cz } = self.collider.translation();
-
-        const position = new Vector3(cx, cy, cz);
+        const position = new Vector3(x, y, z);
         
-        const velocity = calculateVelocity(self);
+        const velocity = calculateVelocity({ SPEED_UP_CONSTANT, delta, direction });
 
-        velocity.multiplyScalar(self.delta);
+        velocity.multiplyScalar(delta);
 
-        if(self.cameraController) velocity.applyQuaternion(self.cameraController.camera.quaternion);
+        if(cameraController !== undefined) velocity.applyQuaternion(cameraController.camera.quaternion);
 
         position.add(velocity);
 
@@ -174,12 +182,17 @@ export class BaseController implements Controller {
         this.target = target;
     }
 
+    resetVelocity() {
+        this.velocity = new Vector3(0,0,0);
+    }
+
     /**
      * @description updates the controller
      */
     update(delta: number) {
         this.delta = delta;
-        if(this.translateXDirection || this.translateYDirection || this.translateZDirection || this.translateXYZDirection) this.handleTranslateXYZDirection();
+        this.resetVelocity(); //reset on every tick
+        if(this.translateXDirection || this.translateYDirection || this.translateZDirection || this.translateXYZDirection) return this.handleTranslateXYZDirection();
         // if(this.translateXDirection) return this.handleTranslateXDirection();
         // if(this.translateYDirection) return this.handleTranslateYDirection();
         // if(this.translateZDirection) return this.handleTranslateZDirection();

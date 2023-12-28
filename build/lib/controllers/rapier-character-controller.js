@@ -9,9 +9,6 @@ class RapierColliderController extends controller_1.BaseController {
         super({ target: null, options });
         this.collider = null;
         this.toi = 0;
-        this.position = new Vector3_1.Vector3(0, 0, 0);
-        this.rotation = new Quaternion_1.Quaternion(0, 0, 0, 0);
-        this.velocity = new Vector3_1.Vector3(0, 0, 0);
         this.world = world;
         this.offset = offset;
         this.controller = this.initCharacterController();
@@ -86,7 +83,14 @@ class RapierColliderController extends controller_1.BaseController {
         if (!this.collider)
             return;
         this.setColliderQuaternionFromCameraController();
-        const computedTranslation = controller_1.BaseController.computeTranslationXYZDirection(this);
+        const { x: cx, y: cy, z: cz } = this.collider.translation();
+        const computedTranslation = controller_1.BaseController.computeTranslationXYZDirection({
+            SPEED_UP_CONSTANT: this.SPEED_UP_CONSTANT,
+            delta: this.delta,
+            direction: this.direction,
+            translation: new Vector3_1.Vector3(cx, cy, cz),
+            cameraController: this.cameraController
+        });
         if (!computedTranslation)
             return;
         const { position: desiredMovementVector, velocity: desiredVelocityVector } = computedTranslation;
@@ -113,7 +117,6 @@ class RapierColliderController extends controller_1.BaseController {
             this.desiredVelocityVector = new Vector3_1.Vector3(0, 0, 0);
         }
         else {
-            // this.desiredMovementVector = this.isCollisionImminent({ toi: this.offset }) ? new Vector3(correctedMovement.x, correctedMovement.y, correctedMovement.z) : desiredMovementVector;
             this.desiredMovementVector = desiredMovementVector;
             /** carry out corrections based on max an min translation options */
             this.desiredMovementVector.y = Math.min(Math.max(this.desiredMovementVector.y, (_g = (_f = (_e = this.options) === null || _e === void 0 ? void 0 : _e.translation) === null || _f === void 0 ? void 0 : _f.max) === null || _g === void 0 ? void 0 : _g.y), (_k = (_j = (_h = this.options) === null || _h === void 0 ? void 0 : _h.translation) === null || _j === void 0 ? void 0 : _j.max) === null || _k === void 0 ? void 0 : _k.y);
@@ -121,9 +124,9 @@ class RapierColliderController extends controller_1.BaseController {
             this.desiredVelocityVector.y = Math.min(Math.max(this.desiredMovementVector.y, (_o = (_m = (_l = this.options) === null || _l === void 0 ? void 0 : _l.translation) === null || _m === void 0 ? void 0 : _m.max) === null || _o === void 0 ? void 0 : _o.y), (_r = (_q = (_p = this.options) === null || _p === void 0 ? void 0 : _p.translation) === null || _q === void 0 ? void 0 : _q.max) === null || _r === void 0 ? void 0 : _r.y);
         }
         /** update computational values */
-        this.updateColliderPosition();
-        this.updateTargetPosition();
-        this.updateTargetQuaternion();
+        this.updateColliderPosition(); // this current colliders position
+        this.updateTargetPosition(); //if target is attached
+        this.updateTargetQuaternion(); // if target is attached
         /** update internal values */
         this._updateColliderPosition();
         this._updateColliderQuaternion();
@@ -148,25 +151,20 @@ class RapierColliderController extends controller_1.BaseController {
         if (this.collider)
             this.collider.setTranslation(this.desiredMovementVector);
     }
-    updateColliderPositionFromVelocity() {
-        if (!this.collider)
-            return;
-        const { x, y, z } = this.collider.translation();
-        const colliderVec3 = new Vector3_1.Vector3(x, y, z);
-        colliderVec3.add(this.desiredVelocityVector);
-        this.collider.setTranslation(colliderVec3);
-    }
+    /** update internal this.position value */
     _updateColliderPosition() {
         if (!this.collider)
             return;
         this.position.copy(this.desiredMovementVector);
     }
+    /** update internal this.rotation value */
     _updateColliderQuaternion() {
         if (!this.collider)
             return;
         const { x, y, z, w } = this.collider.rotation();
         this.rotation.copy(new Quaternion_1.Quaternion(x, y, z, w));
     }
+    /** update internal this.velocity */
     _updateColliderVelocity() {
         if (!this.collider)
             return;

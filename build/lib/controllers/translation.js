@@ -2,417 +2,142 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TranslationController = void 0;
 const Vector3_1 = require("three/src/math/Vector3");
-const Vector4_1 = require("three/src/math/Vector4");
-const Quaternion_1 = require("three/src/math/Quaternion");
 const types_1 = require("../../types");
-class TranslationController {
-    constructor(args) {
-        this.SLOW_DOWN_CONSTANT = 10;
-        this.SPEED_UP_CONSTANT = 400;
-        this.velocity = new Vector3_1.Vector3(0, 0, 0);
-        this.direction = new Vector3_1.Vector3(0, 0, 0);
-        this.target = null;
-        this.copyToTarget = [];
-        this.delta = 0;
-        this.translateXDirection = false;
-        this.translateZDirection = false;
-        /** extra data */
-        this.cameraController = null;
-        if (args === null)
+const controller_1 = require("./controller");
+class TranslationController extends controller_1.BaseController {
+    constructor({ options, RCC, CCC }) {
+        super({ target: null, options });
+        this.RCC = RCC;
+        this.CCC = CCC;
+    }
+    /**
+     * @description setup rapier coontroller class instance
+     * @param RCC RapierColliderController
+    */
+    setRCC(RCC) {
+        this.RCC = RCC;
+    }
+    /**
+     * @description setup up camera controller class instance
+     * @param CCC CameraController
+     * */
+    setCCC(CCC) {
+        this.CCC = CCC;
+    }
+    translateOrbitControls() {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+        const orbitControls = this.getOrbitControls();
+        if (!orbitControls)
             return;
-        if (args === null || args === void 0 ? void 0 : args.cameraController)
-            this.cameraController = args.cameraController;
-        if (args === null || args === void 0 ? void 0 : args.copyToTarget)
-            this.copyToTarget = args.copyToTarget;
-    }
-    /** setup camera controller */
-    setCameraController(controller) {
-        this.cameraController = controller;
-    }
-    /** set translation state */
-    setTranslateXDirection(state, distance) {
-        if (distance)
-            this.direction = new Vector3_1.Vector3(distance, 0, 0);
-        this.translateXDirection = state;
-    }
-    setTranslateZDirection(state, distance) {
-        if (distance)
-            this.direction = new Vector3_1.Vector3(0, 0, distance);
-        this.translateZDirection = state;
-    }
-    /** master controls */
-    translateX(value) {
-        var _a;
-        switch ((_a = this.target) === null || _a === void 0 ? void 0 : _a.type) {
-            case types_1.ControlType.OBJECT_3D:
-                return this.object3DTranslateX(value, null);
-            case types_1.ControlType.ORBIT_CONTROLS:
-                return this.orbitControlsTranslateX(value, null);
-            case types_1.ControlType.POINTER_LOCK_CONTROLS:
-                return this.pointerControlsTranslateX(value, null);
-            case types_1.ControlType.RAPIER_COLLIDER:
-                return this.rapierColliderTranslateX(value);
-            default:
-                return null;
-        }
-    }
-    translateZ(value) {
-        var _a;
-        if (!this.target) {
-            return null;
-        }
-        ;
-        switch ((_a = this.target) === null || _a === void 0 ? void 0 : _a.type) {
-            case types_1.ControlType.OBJECT_3D:
-                return this.object3DTranslateZ(value, null);
-            case types_1.ControlType.ORBIT_CONTROLS:
-                return this.orbitControlsTranslateZ(value, null);
-            case types_1.ControlType.POINTER_LOCK_CONTROLS:
-                return this.pointerControlsTranslateZ(value, null);
-            case types_1.ControlType.RAPIER_COLLIDER:
-                return this.rapierColliderTranslateZ(value);
-            default:
-                return null;
-        }
-    }
-    /** @description handle orbit controls -x +x translation */
-    orbitControlsTranslateX(value, controller) {
-        if (!this.target)
-            return null;
-        if (!value)
-            return null;
-        const object = this.getOrbitControls(controller);
-        if (!object)
-            return null;
-        const direction = new Vector3_1.Vector3(value, 0, 0);
-        this.velocity = this.calculateVelocity(direction);
-        this.velocity.multiplyScalar(this.delta);
-        if (this.cameraController)
-            this.applyCameraControllerQuaternion();
-        this.velocity.y = 0;
-        object.object.position.add(this.velocity);
-        object.target.add(this.velocity);
-        return this.velocity;
-    }
-    /** @description handle orbit controls -z +z translation */
-    orbitControlsTranslateZ(value, controller) {
-        if (!this.target)
-            return null;
-        if (!value)
-            return null;
-        const object = this.getOrbitControls(controller);
-        if (!object)
-            return null;
-        const direction = new Vector3_1.Vector3(0, 0, value);
-        this.velocity = this.calculateVelocity(direction);
-        this.velocity.multiplyScalar(this.delta);
-        if (this.cameraController)
-            this.applyCameraControllerQuaternion();
-        this.velocity.y = 0;
-        object.object.position.add(this.velocity);
-        object.target.add(this.velocity);
-        return this.velocity;
-    }
-    /** @description handle pointer controls -x +x translation */
-    pointerControlsTranslateX(value, controller) {
-        if (!this.target)
-            return null;
-        if (!value)
-            return null;
-        const object = this.getPointLockControls(controller);
-        if (!object)
-            return null;
-        const direction = new Vector3_1.Vector3(value, 0, 0);
-        const velocity = this.calculateVelocity(direction);
-        velocity.multiplyScalar(this.delta);
-        if (this.cameraController)
-            this.applyCameraControllerQuaternion();
-        velocity.y = 0;
-        object.moveRight(velocity.x);
-        return this.velocity;
-    }
-    /** @description handle pointer controls -z +z translation */
-    pointerControlsTranslateZ(value, controller) {
-        if (!this.target)
-            return null;
-        if (!value)
-            return null;
-        const object = this.getPointLockControls(controller);
-        if (!object) {
-            return null;
-        }
-        ;
-        const direction = new Vector3_1.Vector3(0, 0, value);
-        const velocity = this.calculateVelocity(direction);
-        velocity.multiplyScalar(this.delta);
-        if (this.cameraController)
-            this.applyCameraControllerQuaternion();
-        velocity.y = 0;
-        object.moveForward(-velocity.z);
-        return this.velocity;
-    }
-    rapierColliderTranslateX(value) {
-        if (!this.target)
-            return null;
-        if (!value)
-            return null;
-        const object = this.target.object;
-        const direction = new Vector3_1.Vector3(value, 0, 0);
-        this.velocity = this.calculateVelocity(direction);
-        this.velocity.multiplyScalar(this.delta);
-        let currTranslation = new Vector3_1.Vector3(object.translation().x, object.translation().y, object.translation().z);
-        if (this.cameraController)
-            this.applyCameraControllerQuaternion();
-        this.velocity.y = 0;
-        currTranslation.add(this.velocity);
-        object.setTranslation(currTranslation);
-        return this.velocity;
-    }
-    rapierColliderTranslateZ(value) {
-        if (!this.target)
-            return null;
-        if (!value)
-            return null;
-        const object = this.target.object;
-        const direction = new Vector3_1.Vector3(0, 0, value);
-        this.velocity = this.calculateVelocity(direction);
-        this.velocity.multiplyScalar(this.delta);
-        let currTranslation = new Vector3_1.Vector3(object.translation().x, object.translation().y, object.translation().z);
-        if (this.cameraController)
-            this.applyCameraControllerQuaternion();
-        this.velocity.y = 0;
-        currTranslation.add(this.velocity);
-        object.setTranslation(currTranslation);
-        return this.velocity;
-    }
-    static translateControls(cameraController, velocity, directionState) {
-        const controls = cameraController.controls;
-        const control = controls.find(control => control.userData && control.userData.active === true);
-        if (!(control === null || control === void 0 ? void 0 : control.userData))
-            return null;
-        switch (control.userData.type) {
-            case types_1.ControlType.ORBIT_CONTROLS:
-                control.object.position.add(velocity);
-                control.target.add(velocity);
-                break;
-            case types_1.ControlType.POINTER_LOCK_CONTROLS:
-                control[(directionState === null || directionState === void 0 ? void 0 : directionState.translateXDirection) ? 'moveRight' : 'moveForward']((directionState === null || directionState === void 0 ? void 0 : directionState.translateXDirection) ? velocity.x : velocity.z);
-            default:
-                return null;
-        }
-    }
-    rapierRigidBodyTranslateX() {
-        return null;
-    }
-    rapierRigidBodyTranslateZ() {
-        return null;
-    }
-    object3DTranslateX(value, controller) {
-        if (!this.target)
-            return null;
-        if (!value)
-            return null;
-        const object = (controller || this.target.object);
-        const direction = new Vector3_1.Vector3(value, 0, 0);
-        this.velocity = this.calculateVelocity(direction);
-        this.velocity.multiplyScalar(this.delta);
-        if (this.cameraController)
-            this.applyCameraControllerQuaternion();
-        this.velocity.y = 0;
-        object.position.add(this.velocity);
-        return this.velocity;
-    }
-    object3DTranslateZ(value, controller) {
-        if (!this.target)
-            return null;
-        if (!value)
-            return null;
-        const object = (controller || this.target.object);
-        const direction = new Vector3_1.Vector3(0, 0, value);
-        this.velocity = this.calculateVelocity(direction);
-        this.velocity.multiplyScalar(this.delta);
-        if (this.cameraController)
-            this.applyCameraControllerQuaternion();
-        this.velocity.y = 0;
-        object.position.add(this.velocity);
-        return this.velocity;
-    }
-    getTargetObjectPosition() {
-        if (!this.target)
-            return null;
-    }
-    /** set target */
-    setTargetObject(target) {
-        this.target = target;
-    }
-    /** copy to */
-    copyTo(copyToTarget) {
-        this.copyToTarget = copyToTarget;
-    }
-    /** utils */
-    applyCameraControllerQuaternion() {
-        if (this.cameraController === null)
+        if (this.RCC) {
+            orbitControls.object.position.add(this.RCC.velocity.clone());
+            orbitControls.target.add(this.RCC.velocity.clone());
             return;
-        let quaternion = new Quaternion_1.Quaternion(this.cameraController.camera.quaternion.x, this.cameraController.camera.quaternion.y, this.cameraController.camera.quaternion.z, this.cameraController.camera.quaternion.w);
-        this.velocity.applyQuaternion(quaternion);
+        }
+        const { x: px, y: py, z: pz } = orbitControls.object.position;
+        const computedTranslation = controller_1.BaseController.computeTranslationXYZDirection({
+            SPEED_UP_CONSTANT: this.SPEED_UP_CONSTANT,
+            delta: this.delta,
+            direction: this.direction,
+            translation: new Vector3_1.Vector3(px, py, pz),
+            cameraController: this.cameraController
+        });
+        if (!computedTranslation)
+            return;
+        const { position: desiredMovementVector, velocity: desiredVelocityVector } = computedTranslation;
+        this.desiredMovementVector = desiredMovementVector;
+        /** carry out corrections based on max an min translation options */
+        this.desiredMovementVector.y = Math.min(Math.max(this.desiredMovementVector.y, (_c = (_b = (_a = this.options) === null || _a === void 0 ? void 0 : _a.translation) === null || _b === void 0 ? void 0 : _b.max) === null || _c === void 0 ? void 0 : _c.y), (_f = (_e = (_d = this.options) === null || _d === void 0 ? void 0 : _d.translation) === null || _e === void 0 ? void 0 : _e.max) === null || _f === void 0 ? void 0 : _f.y);
+        this.desiredVelocityVector = desiredVelocityVector;
+        this.desiredVelocityVector.y = Math.min(Math.max(this.desiredMovementVector.y, (_j = (_h = (_g = this.options) === null || _g === void 0 ? void 0 : _g.translation) === null || _h === void 0 ? void 0 : _h.max) === null || _j === void 0 ? void 0 : _j.y), (_m = (_l = (_k = this.options) === null || _k === void 0 ? void 0 : _k.translation) === null || _l === void 0 ? void 0 : _l.max) === null || _m === void 0 ? void 0 : _m.y);
+        orbitControls.object.position.add(this.desiredVelocityVector);
+        orbitControls.target.add(this.desiredVelocityVector);
     }
-    calculateVelocity(direction) {
-        let VAL_ENUM = [1, -1];
-        let velocity = new Vector3_1.Vector3(0, 0, 0);
-        for (const [key, index] of Object.keys(direction)) {
-            if (VAL_ENUM.includes(direction[key])) {
-                velocity[key] -= direction[key] * this.SPEED_UP_CONSTANT * this.delta;
+    translatePointerLockControls() {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+        const pointerLockControls = this.getPointLockControls();
+        if (!pointerLockControls)
+            return;
+        if (this.RCC) {
+            const { x: rccX, y: rccY, z: rccZ } = this.RCC.position.clone();
+            if (this.translateZDirection) {
+                pointerLockControls.camera.position.set(rccX, pointerLockControls.camera.position.y, rccZ);
             }
-        }
-        return velocity;
-    }
-    getTargetObjectTranslation() {
-        if (!this.target)
-            return null;
-        switch (this.target.type) {
-            case types_1.ControlType.OBJECT_3D:
-                return [
-                    new Vector3_1.Vector3().copy(this.target.object.position)
-                ];
-            case types_1.ControlType.ORBIT_CONTROLS:
-                return [
-                    new Vector3_1.Vector3().copy(this.target.object.object.position),
-                    new Vector3_1.Vector3().copy(this.target.object.target),
-                ];
-            case types_1.ControlType.POINTER_LOCK_CONTROLS:
-                return [
-                    new Vector3_1.Vector3().copy(this.target.object.camera.position),
-                ];
-            case types_1.ControlType.RAPIER_COLLIDER:
-                const pos = this.target.object.translation();
-                const rotation = this.target.object.rotation();
-                let rotVec4 = new Vector4_1.Vector4(rotation.x, rotation.y, rotation.z, rotation.w);
-                return [
-                    new Vector3_1.Vector3(pos.x, pos.y, pos.z),
-                    new Quaternion_1.Quaternion(rotVec4.x, rotVec4.y, rotVec4.z, rotVec4.w)
-                ];
-            default:
-                return null;
-        }
-    }
-    updateCopyTargetObject(updateActiveCameraController) {
-        var _a;
-        if ((_a = this.copyToTarget) === null || _a === void 0 ? void 0 : _a.length) {
-            const translation = this.getTargetObjectTranslation();
-            for (const target of this.copyToTarget) {
-                switch (target.type) {
-                    case types_1.ControlType.OBJECT_3D:
-                        // if(this.translateXDirection) this.object3DTranslateX(this.direction.x,target.object);
-                        // if(this.translateZDirection) this.object3DTranslateZ(this.direction.z,target.object);
-                        if (!translation)
-                            break;
-                        target.object.position.copy(translation[0]);
-                        break;
-                    case types_1.ControlType.ORBIT_CONTROLS:
-                        if (this.translateXDirection)
-                            this.orbitControlsTranslateX(this.direction.x, target.object);
-                        if (this.translateZDirection)
-                            this.orbitControlsTranslateZ(this.direction.z, target.object);
-                        break;
-                    case types_1.ControlType.POINTER_LOCK_CONTROLS:
-                        if (this.translateXDirection)
-                            this.pointerControlsTranslateX(this.direction.x, target.object);
-                        if (this.translateZDirection)
-                            this.pointerControlsTranslateZ(this.direction.z, target.object);
-                        break;
-                    case types_1.ControlType.RAPIER_COLLIDER:
-                        break;
-                    default:
-                }
+            if (this.translateXDirection) {
+                pointerLockControls.camera.position.set(rccX, pointerLockControls.camera.position.y, rccZ);
             }
-        }
-        if (!updateActiveCameraController) {
-            return;
-        }
-        ;
-        const type = this.getCameraControllerActiveControlType();
-        if (!type)
-            return;
-        if (![types_1.ControlType.ORBIT_CONTROLS, types_1.ControlType.POINTER_LOCK_CONTROLS].includes(type)) {
-            return;
-        }
-        if (this.translateXDirection)
-            this[type === types_1.ControlType.ORBIT_CONTROLS ? 'orbitControlsTranslateX' : 'pointerControlsTranslateX'](this.direction.x, this.cameraController);
-        if (this.translateZDirection)
-            this[type === types_1.ControlType.ORBIT_CONTROLS ? 'orbitControlsTranslateZ' : 'pointerControlsTranslateZ'](this.direction.z, this.cameraController);
-    }
-    updateCopyTargetObjectVelocity(updateActiveCameraController) {
-        var _a;
-        if ((_a = this.copyToTarget) === null || _a === void 0 ? void 0 : _a.length) {
-            const translation = this.getTargetObjectTranslation();
-            for (const target of this.copyToTarget) {
-                switch (target.type) {
-                    case types_1.ControlType.OBJECT_3D:
-                        if (this.translateXDirection)
-                            this.object3DTranslateX(this.direction.x, target.object);
-                        if (this.translateZDirection)
-                            this.object3DTranslateZ(this.direction.z, target.object);
-                        break;
-                    case types_1.ControlType.ORBIT_CONTROLS:
-                        if (this.translateXDirection)
-                            this.orbitControlsTranslateX(this.direction.x, target.object);
-                        if (this.translateZDirection)
-                            this.orbitControlsTranslateZ(this.direction.z, target.object);
-                        break;
-                    case types_1.ControlType.POINTER_LOCK_CONTROLS:
-                        if (this.translateXDirection)
-                            this.pointerControlsTranslateX(this.direction.x, target.object);
-                        if (this.translateZDirection)
-                            this.pointerControlsTranslateZ(this.direction.z, target.object);
-                        break;
-                    case types_1.ControlType.RAPIER_COLLIDER:
-                        break;
-                    default:
-                }
+            if (this.translateXYZDirection) {
+                pointerLockControls.camera.position.set(rccX, pointerLockControls.camera.position.y, rccZ);
+                pointerLockControls.camera.position.set(rccX, pointerLockControls.camera.position.y, rccZ);
             }
-        }
-        if (!updateActiveCameraController) {
             return;
         }
-        ;
-        const type = this.getCameraControllerActiveControlType();
-        if (!type) {
+        const { x: px, y: py, z: pz } = pointerLockControls.camera.position;
+        const computedTranslation = controller_1.BaseController.computeTranslationXYZDirection({
+            SPEED_UP_CONSTANT: this.SPEED_UP_CONSTANT,
+            delta: this.delta,
+            direction: this.direction,
+            translation: new Vector3_1.Vector3(px, py, pz),
+            //  cameraController: this.cameraController as CameraControllerType //causing funny side effects
+        });
+        if (!computedTranslation)
             return;
+        const { position: desiredMovementVector, velocity: desiredVelocityVector } = computedTranslation;
+        this.desiredMovementVector = desiredMovementVector;
+        /** carry out corrections based on max an min translation options */
+        this.desiredMovementVector.y = Math.min(Math.max(this.desiredMovementVector.y, (_c = (_b = (_a = this.options) === null || _a === void 0 ? void 0 : _a.translation) === null || _b === void 0 ? void 0 : _b.max) === null || _c === void 0 ? void 0 : _c.y), (_f = (_e = (_d = this.options) === null || _d === void 0 ? void 0 : _d.translation) === null || _e === void 0 ? void 0 : _e.max) === null || _f === void 0 ? void 0 : _f.y);
+        this.desiredVelocityVector = desiredVelocityVector;
+        this.desiredVelocityVector.y = Math.min(Math.max(this.desiredMovementVector.y, (_j = (_h = (_g = this.options) === null || _g === void 0 ? void 0 : _g.translation) === null || _h === void 0 ? void 0 : _h.max) === null || _j === void 0 ? void 0 : _j.y), (_m = (_l = (_k = this.options) === null || _k === void 0 ? void 0 : _k.translation) === null || _l === void 0 ? void 0 : _l.max) === null || _m === void 0 ? void 0 : _m.y);
+        if (this.translateZDirection) {
+            pointerLockControls.moveForward(-this.desiredVelocityVector.z);
         }
-        ;
-        if (![types_1.ControlType.ORBIT_CONTROLS, types_1.ControlType.POINTER_LOCK_CONTROLS].includes(type)) {
-            return;
+        if (this.translateXDirection) {
+            pointerLockControls.moveRight(this.desiredVelocityVector.x);
         }
-        if (this.translateXDirection)
-            this[type === types_1.ControlType.ORBIT_CONTROLS ? 'orbitControlsTranslateX' : 'pointerControlsTranslateX'](this.direction.x, this.cameraController);
-        if (this.translateZDirection)
-            this[type === types_1.ControlType.ORBIT_CONTROLS ? 'orbitControlsTranslateZ' : 'pointerControlsTranslateZ'](this.direction.z, this.cameraController);
+        if (this.translateXYZDirection) {
+            pointerLockControls.moveForward(-this.desiredVelocityVector.z);
+            pointerLockControls.moveRight(this.desiredVelocityVector.x);
+        }
     }
+    handleTranslateXYZDirection() {
+        if (this.getCameraControllerActiveControlType() === types_1.ControlType.ORBIT_CONTROLS) {
+            this.translateOrbitControls();
+        }
+        if (this.getCameraControllerActiveControlType() === types_1.ControlType.POINTER_LOCK_CONTROLS) {
+            this.translatePointerLockControls();
+        }
+    }
+    /** handle simulation */
     update(delta) {
         this.delta = delta;
         this.velocity.x -= this.velocity.x * this.SLOW_DOWN_CONSTANT * this.delta;
         this.velocity.z -= this.velocity.z * this.SLOW_DOWN_CONSTANT * this.delta;
-        if (this.translateXDirection)
-            this.translateX(this.direction.x);
-        if (this.translateZDirection)
-            this.translateZ(this.direction.z);
+        if (this.RCC) {
+            this.translateXDirection = this.RCC.translateXDirection;
+            this.translateZDirection = this.RCC.translateZDirection;
+            this.translateXYZDirection = this.RCC.translateXYZDirection;
+        }
+        if (this.translateXDirection || this.translateZDirection || this.translateXYZDirection)
+            return this.handleTranslateXYZDirection();
     }
     /** get orbit controls */
     getOrbitControls(controller) {
-        var _a;
-        let c = (controller !== null ? controller.controls : ((_a = this.target) === null || _a === void 0 ? void 0 : _a.object).controls).find((control) => control.userData && control.userData.type === types_1.ControlType.ORBIT_CONTROLS);
-        if (!c) {
+        const cameraController = controller || this.cameraController;
+        if (!cameraController)
             return null;
-        }
-        return c;
+        const orbitControls = cameraController.controls.find((control) => control.userData && control.userData.type === types_1.ControlType.ORBIT_CONTROLS);
+        if (!orbitControls)
+            return null;
+        return orbitControls;
     }
     getPointLockControls(controller) {
-        var _a;
-        let c = (controller !== null ? controller.controls : ((_a = this.target) === null || _a === void 0 ? void 0 : _a.object).controls).find(control => control.userData && control.userData.type === types_1.ControlType.POINTER_LOCK_CONTROLS);
-        if (!c) {
+        const cameraController = controller || this.cameraController;
+        if (!cameraController)
             return null;
-        }
-        return c;
+        const pointerLockControls = cameraController.controls.find((control) => control.userData && control.userData.type === types_1.ControlType.POINTER_LOCK_CONTROLS);
+        if (!pointerLockControls)
+            return null;
+        return pointerLockControls;
     }
     getCameraControllerActiveControlType() {
         var _a;

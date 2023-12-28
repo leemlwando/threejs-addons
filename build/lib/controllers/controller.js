@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseController = void 0;
 const Vector3_1 = require("three/src/math/Vector3");
+const Quaternion_1 = require("three/src/math/Quaternion");
 const helpers_1 = require("../../utils/helpers");
 class BaseController {
     constructor({ target, options }) {
@@ -10,15 +11,18 @@ class BaseController {
         this.translateZDirection = false;
         this.translateXYZDirection = false;
         this.direction = new Vector3_1.Vector3(0, 0, 0);
+        this.position = new Vector3_1.Vector3(0, 0, 0);
+        this.rotation = new Quaternion_1.Quaternion(0, 0, 0, 0);
+        this.velocity = new Vector3_1.Vector3(0, 0, 0);
         this.delta = 0;
         this.SPEED_UP_CONSTANT = 400;
+        this.SLOW_DOWN_CONSTANT = 10;
         this.desiredMovementVector = new Vector3_1.Vector3(0, 0, 0);
         this.desiredVelocityVector = new Vector3_1.Vector3(0, 0, 0);
         if (target)
             this.setTarget(target);
         if (options)
             this.options = options;
-        console.log('options', options);
     }
     /**
      * @description sets camera controller
@@ -63,16 +67,18 @@ class BaseController {
         position.add(velocity);
         return position;
     }
-    static computeTranslationXYZDirection(self) {
-        // let position = new Vector3(self.target.position.x, self.target.position.y, self.target.position.z);
-        if (!self.collider)
-            return null;
-        const { x: cx, y: cy, z: cz } = self.collider.translation();
-        const position = new Vector3_1.Vector3(cx, cy, cz);
-        const velocity = (0, helpers_1.calculateVelocity)(self);
-        velocity.multiplyScalar(self.delta);
-        if (self.cameraController)
-            velocity.applyQuaternion(self.cameraController.camera.quaternion);
+    /**
+     *
+     * @param
+     * @returns
+     */
+    static computeTranslationXYZDirection({ translation, direction, SPEED_UP_CONSTANT, delta, cameraController }) {
+        const { x, y, z } = translation;
+        const position = new Vector3_1.Vector3(x, y, z);
+        const velocity = (0, helpers_1.calculateVelocity)({ SPEED_UP_CONSTANT, delta, direction });
+        velocity.multiplyScalar(delta);
+        if (cameraController !== undefined)
+            velocity.applyQuaternion(cameraController.camera.quaternion);
         position.add(velocity);
         return { position, velocity };
     }
@@ -109,13 +115,17 @@ class BaseController {
         this._target = target;
         this.target = target;
     }
+    resetVelocity() {
+        this.velocity = new Vector3_1.Vector3(0, 0, 0);
+    }
     /**
      * @description updates the controller
      */
     update(delta) {
         this.delta = delta;
+        this.resetVelocity(); //reset on every tick
         if (this.translateXDirection || this.translateYDirection || this.translateZDirection || this.translateXYZDirection)
-            this.handleTranslateXYZDirection();
+            return this.handleTranslateXYZDirection();
         // if(this.translateXDirection) return this.handleTranslateXDirection();
         // if(this.translateYDirection) return this.handleTranslateYDirection();
         // if(this.translateZDirection) return this.handleTranslateZDirection();

@@ -1,11 +1,15 @@
 export declare const DEFAULT_OPTIONS: {
     translation: {
         min: {
-            y: number;
+            x?: number;
+            y?: number;
+            z?: number;
         };
         max: {
-            y: number;
+            x?: number;
+            y?: number;
+            z?: number;
         };
     };
-    filterGroups: number;
+    filterGroups?: number;
 };

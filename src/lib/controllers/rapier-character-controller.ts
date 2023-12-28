@@ -2,6 +2,7 @@ import * as RAPIER from '@dimforge/rapier3d-compat';
 import { BaseController } from './controller';
 import { Vector3 } from 'three/src/math/Vector3';
 import { Quaternion } from 'three/src/math/Quaternion';
+import { CameraControllerType } from '../../types';
 
 interface RapierColliderControllerAPI {
    world: RAPIER.World;
@@ -9,9 +10,6 @@ interface RapierColliderControllerAPI {
    controller: RAPIER.KinematicCharacterController;
    collider: RAPIER.Collider | null;
    toi: number;
-   position: Vector3;
-   rotation: Quaternion;
-   velocity: Vector3;
 }
 
 export class RapierColliderController extends BaseController implements RapierColliderControllerAPI {
@@ -20,9 +18,6 @@ export class RapierColliderController extends BaseController implements RapierCo
     controller: RAPIER.KinematicCharacterController;
     collider: RAPIER.Collider | null = null;
     toi: number = 0;
-    readonly position: Vector3 = new Vector3(0, 0, 0);
-    readonly rotation: Quaternion = new Quaternion(0, 0, 0, 0);
-    readonly velocity: Vector3 = new Vector3(0, 0, 0);
     
     constructor(world: RAPIER.World, offset: number, options: object){
         super({ target: null, options });
@@ -44,7 +39,7 @@ export class RapierColliderController extends BaseController implements RapierCo
      * @description compute movements of collider
      * @returns number of collisions
      */
-    computeMovement({ collider, desiredMovementVector, filterFlags, filterGroups, filterPredicate } : { 
+    private computeMovement({ collider, desiredMovementVector, filterFlags, filterGroups, filterPredicate } : { 
         collider: RAPIER.Collider | null, 
         desiredMovementVector: RAPIER.Vector, 
         filterFlags?: RAPIER.QueryFilterFlags | undefined,
@@ -67,7 +62,7 @@ export class RapierColliderController extends BaseController implements RapierCo
      * @description get computed collisions
      * @returns Array of collisions
      */
-    getComputedCollisions(): RAPIER.CharacterCollision[] {
+    private getComputedCollisions(): RAPIER.CharacterCollision[] {
         let collisions: RAPIER.CharacterCollision[] = [];
 
         for (let i = 0; i < this.controller.numComputedCollisions(); i++) {
@@ -81,7 +76,7 @@ export class RapierColliderController extends BaseController implements RapierCo
     /**
      * @description wether or not collision is imminent
      */
-    isCollisionImminent(): boolean {
+    private isCollisionImminent(): boolean {
         let is_collision_imminent = false;
 
         for (let i = 0; i < this.controller.numComputedCollisions(); i++) {
@@ -95,7 +90,7 @@ export class RapierColliderController extends BaseController implements RapierCo
     /**
      * @description get corrected movement
      */
-    getCorrectedMovement(): RAPIER.Vector3 {
+    private getCorrectedMovement(): RAPIER.Vector3 {
         return this.controller.computedMovement();
     }
 
@@ -119,7 +114,15 @@ export class RapierColliderController extends BaseController implements RapierCo
         if(!this.collider) return;
         this.setColliderQuaternionFromCameraController();
 
-        const computedTranslation = BaseController.computeTranslationXYZDirection(this);
+        const { x: cx, y: cy, z: cz } = this.collider.translation();
+
+        const computedTranslation = BaseController.computeTranslationXYZDirection({
+            SPEED_UP_CONSTANT: this.SPEED_UP_CONSTANT,
+            delta: this.delta,
+            direction: this.direction,
+            translation: new Vector3(cx, cy, cz),
+            cameraController: this.cameraController as CameraControllerType
+        });
 
         if(!computedTranslation) return;
 
@@ -140,7 +143,6 @@ export class RapierColliderController extends BaseController implements RapierCo
             collisions.push(hit);
         }
 
-        
         let is_collision_imminent = false
         let collision_imminent = null
 
@@ -156,20 +158,17 @@ export class RapierColliderController extends BaseController implements RapierCo
         if(is_collision_imminent && collision_imminent && collision_imminent?.toi <= this.toi){
             this.desiredVelocityVector = new Vector3(0, 0, 0);
         }else{
-                    // this.desiredMovementVector = this.isCollisionImminent({ toi: this.offset }) ? new Vector3(correctedMovement.x, correctedMovement.y, correctedMovement.z) : desiredMovementVector;
             this.desiredMovementVector = desiredMovementVector;
             /** carry out corrections based on max an min translation options */
             this.desiredMovementVector.y = Math.min(Math.max(this.desiredMovementVector.y, this.options?.translation?.max?.y), this.options?.translation?.max?.y);
-
             this.desiredVelocityVector = desiredVelocityVector;
             this.desiredVelocityVector.y = Math.min(Math.max(this.desiredMovementVector.y, this.options?.translation?.max?.y), this.options?.translation?.max?.y);
-        
         }
 
         /** update computational values */
-        this.updateColliderPosition();
-        this.updateTargetPosition();
-        this.updateTargetQuaternion()
+        this.updateColliderPosition(); // this current colliders position
+        this.updateTargetPosition(); //if target is attached
+        this.updateTargetQuaternion(); // if target is attached
 
         /** update internal values */
         this._updateColliderPosition();
@@ -196,30 +195,18 @@ export class RapierColliderController extends BaseController implements RapierCo
         if(this.collider) this.collider.setTranslation(this.desiredMovementVector);
     }
 
-    updateColliderPositionFromVelocity(): void {
-        if(!this.collider) return;
-
-        const { x, y, z } = this.collider.translation();
-
-        const colliderVec3 = new Vector3(x, y, z);
-
-        colliderVec3.add(this.desiredVelocityVector);
-
-        this.collider.setTranslation(colliderVec3);
-    }
-
-
+    /** update internal this.position value */
     private _updateColliderPosition(): void {
         if(!this.collider) return;
         this.position.copy(this.desiredMovementVector);
     }
-
+    /** update internal this.rotation value */
     private _updateColliderQuaternion(): void {
         if(!this.collider) return;
         const { x, y, z, w } = this.collider.rotation();
         this.rotation.copy(new Quaternion(x, y, z, w));
     }
-
+    /** update internal this.velocity */
     private _updateColliderVelocity(): void {
         if(!this.collider) return;
         this.velocity.copy(this.desiredVelocityVector);

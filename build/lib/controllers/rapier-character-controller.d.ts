@@ -1,16 +1,11 @@
 import * as RAPIER from '@dimforge/rapier3d-compat';
 import { BaseController } from './controller';
-import { Vector3 } from 'three/src/math/Vector3';
-import { Quaternion } from 'three/src/math/Quaternion';
 interface RapierColliderControllerAPI {
     world: RAPIER.World;
     offset: number;
     controller: RAPIER.KinematicCharacterController;
     collider: RAPIER.Collider | null;
     toi: number;
-    position: Vector3;
-    rotation: Quaternion;
-    velocity: Vector3;
 }
 export declare class RapierColliderController extends BaseController implements RapierColliderControllerAPI {
     world: RAPIER.World;
@@ -18,9 +13,6 @@ export declare class RapierColliderController extends BaseController implements 
     controller: RAPIER.KinematicCharacterController;
     collider: RAPIER.Collider | null;
     toi: number;
-    readonly position: Vector3;
-    readonly rotation: Quaternion;
-    readonly velocity: Vector3;
     constructor(world: RAPIER.World, offset: number, options: object);
     /**
      * @description sets up the character controller
@@ -32,26 +24,20 @@ export declare class RapierColliderController extends BaseController implements 
      * @description compute movements of collider
      * @returns number of collisions
      */
-    computeMovement({ collider, desiredMovementVector, filterFlags, filterGroups, filterPredicate }: {
-        collider: RAPIER.Collider | null;
-        desiredMovementVector: RAPIER.Vector;
-        filterFlags?: RAPIER.QueryFilterFlags | undefined;
-        filterGroups?: number | undefined;
-        filterPredicate?: (collider: RAPIER.Collider) => boolean;
-    }): null | number;
+    private computeMovement;
     /**
      * @description get computed collisions
      * @returns Array of collisions
      */
-    getComputedCollisions(): RAPIER.CharacterCollision[];
+    private getComputedCollisions;
     /**
      * @description wether or not collision is imminent
      */
-    isCollisionImminent(): boolean;
+    private isCollisionImminent;
     /**
      * @description get corrected movement
      */
-    getCorrectedMovement(): RAPIER.Vector3;
+    private getCorrectedMovement;
     /**
      * @param collider
      * @param updateTargetPosition Wether or not to update the target position. This forces the controller to try and update target position even if the collider is null
@@ -67,9 +53,11 @@ export declare class RapierColliderController extends BaseController implements 
     /** set collider quartenion */
     setColliderQuaternionFromCameraController(): void;
     updateColliderPosition(): void;
-    updateColliderPositionFromVelocity(): void;
+    /** update internal this.position value */
     private _updateColliderPosition;
+    /** update internal this.rotation value */
     private _updateColliderQuaternion;
+    /** update internal this.velocity */
     private _updateColliderVelocity;
 }
 export {};
