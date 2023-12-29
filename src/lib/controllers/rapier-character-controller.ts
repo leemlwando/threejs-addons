@@ -20,8 +20,8 @@ export class RapierColliderController extends BaseController implements RapierCo
     collider: Collider | null = null;
     toi: number = 0;
     
-    constructor({ world, offset, options, RCC, CCC } : { world: World, offset: number, options: object, RCC: RapierColliderController, CCC: CameraController }){
-        super({ target: null, options, RCC, CCC });
+    constructor({ world, offset, options, CCC } : { world: World, offset: number, options: object, CCC?: CameraController }){
+        super({ target: null, options, CCC });
         this.world = world;
         this.offset = offset;
         this.controller = this.initCharacterController();

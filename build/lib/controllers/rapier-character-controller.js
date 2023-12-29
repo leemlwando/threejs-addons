@@ -5,8 +5,8 @@ const Base_1 = require("./Base");
 const Vector3_1 = require("three/src/math/Vector3");
 const Quaternion_1 = require("three/src/math/Quaternion");
 class RapierColliderController extends Base_1.BaseController {
-    constructor({ world, offset, options, RCC, CCC }) {
-        super({ target: null, options, RCC, CCC });
+    constructor({ world, offset, options, CCC }) {
+        super({ target: null, options, CCC });
         this.collider = null;
         this.toi = 0;
         this.world = world;
