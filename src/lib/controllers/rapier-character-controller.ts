@@ -103,10 +103,9 @@ export class RapierColliderController extends BaseController implements RapierCo
      */
     setCollider(collider: Collider, updateTargetPosition?: boolean): void {
         this.collider = collider;
-
         if(!this.target && !updateTargetPosition)return;
         const { x, y, z} = this.collider.translation();
-        this.desiredMovementVector = new Vector3(z,y,z);
+        this.desiredMovementVector = new Vector3(x,y,z);
         this.updateTargetPosition();
     }
 

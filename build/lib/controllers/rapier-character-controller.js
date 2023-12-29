@@ -75,7 +75,7 @@ class RapierColliderController extends Base_1.BaseController {
         if (!this.target && !updateTargetPosition)
             return;
         const { x, y, z } = this.collider.translation();
-        this.desiredMovementVector = new Vector3_1.Vector3(z, y, z);
+        this.desiredMovementVector = new Vector3_1.Vector3(x, y, z);
         this.updateTargetPosition();
     }
     /** @description handle XYZ movements */
