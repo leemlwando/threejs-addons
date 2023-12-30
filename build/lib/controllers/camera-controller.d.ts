@@ -70,5 +70,6 @@ export declare class CameraController implements CameraControllerAPI {
     private enableActiveControllerControl;
     /** toggle Control By index */
     private toggleControlTypeByIndex;
+    private normalizeOrbitControlsTarget;
 }
 export {};

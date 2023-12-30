@@ -65,5 +65,9 @@ export declare class RapierColliderController extends BaseController implements 
     private _updateColliderQuaternion;
     /** update internal this.velocity */
     private _updateColliderVelocity;
+    /** update filter groups on options */
+    updateFilterGroups(groups: number): void;
+    /** update options */
+    updateOptions(options: object): void;
 }
 export {};

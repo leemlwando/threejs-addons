@@ -80,7 +80,7 @@ class RapierColliderController extends Base_1.BaseController {
     }
     /** @description handle XYZ movements */
     handleTranslateXYZDirection() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
+        var _a, _b, _c, _d, _e;
         if (!this.collider)
             return;
         this.setColliderQuaternionFromCameraController();
@@ -120,9 +120,12 @@ class RapierColliderController extends Base_1.BaseController {
         else {
             this.desiredMovementVector = desiredMovementVector;
             /** carry out corrections based on max an min translation options */
-            this.desiredMovementVector.y = Math.min(Math.max(this.desiredMovementVector.y, (_h = (_g = (_f = this.options) === null || _f === void 0 ? void 0 : _f.translation) === null || _g === void 0 ? void 0 : _g.max) === null || _h === void 0 ? void 0 : _h.y), (_l = (_k = (_j = this.options) === null || _j === void 0 ? void 0 : _j.translation) === null || _k === void 0 ? void 0 : _k.max) === null || _l === void 0 ? void 0 : _l.y);
+            // this.desiredMovementVector.y = Math.min(Math.max(this.desiredMovementVector.y, this.options?.translation?.max?.y), this.options?.translation?.max?.y);
+            // this.desiredVelocityVector = desiredVelocityVector;
+            // this.desiredVelocityVector.y = Math.min(Math.max(this.desiredMovementVector.y, this.options?.translation?.max?.y), this.options?.translation?.max?.y);
+            this.desiredMovementVector.y = shapePosition.y;
             this.desiredVelocityVector = desiredVelocityVector;
-            this.desiredVelocityVector.y = Math.min(Math.max(this.desiredMovementVector.y, (_p = (_o = (_m = this.options) === null || _m === void 0 ? void 0 : _m.translation) === null || _o === void 0 ? void 0 : _o.max) === null || _p === void 0 ? void 0 : _p.y), (_s = (_r = (_q = this.options) === null || _q === void 0 ? void 0 : _q.translation) === null || _r === void 0 ? void 0 : _r.max) === null || _s === void 0 ? void 0 : _s.y);
+            this.desiredVelocityVector.y = 0;
         }
         /** update computational values */
         this.updateColliderPosition(); // this current colliders position
@@ -170,6 +173,14 @@ class RapierColliderController extends Base_1.BaseController {
         if (!this.collider)
             return;
         this.velocity.copy(this.desiredVelocityVector);
+    }
+    /** update filter groups on options */
+    updateFilterGroups(groups) {
+        this.options.filterGroups = groups;
+    }
+    /** update options */
+    updateOptions(options) {
+        this.options = options;
     }
 }
 exports.RapierColliderController = RapierColliderController;
