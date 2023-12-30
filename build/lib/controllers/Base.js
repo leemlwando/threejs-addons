@@ -17,6 +17,7 @@ class BaseController {
         this.delta = 0;
         this.SPEED_UP_CONSTANT = 400;
         this.SLOW_DOWN_CONSTANT = 10;
+        this.speedFactor = 0.15;
         this.desiredMovementVector = new Vector3_1.Vector3(0, 0, 0);
         this.desiredVelocityVector = new Vector3_1.Vector3(0, 0, 0);
         if (target)
@@ -50,6 +51,16 @@ class BaseController {
      * */
     setTCC(TCC) {
         this.TCC = TCC;
+    }
+    /**
+     * @description set speedfactor
+     * @param speedFactor: number
+     */
+    setSpeedFactor(speedFactor) {
+        this.speedFactor = speedFactor;
+    }
+    updateSpeedFactor(increment) {
+        this.speedFactor = Math.max(0.01, Math.min((this.speedFactor + increment), 1));
     }
     /**
      * @description sets camera controller
@@ -99,10 +110,10 @@ class BaseController {
      * @param
      * @returns
      */
-    static computeTranslationXYZDirection({ translation, direction, SPEED_UP_CONSTANT, delta, cameraController }) {
+    static computeTranslationXYZDirection({ translation, direction, SPEED_UP_CONSTANT, delta, cameraController, speedFactor }) {
         const { x, y, z } = translation;
         const position = new Vector3_1.Vector3(x, y, z);
-        const velocity = (0, helpers_1.calculateVelocity)({ SPEED_UP_CONSTANT, delta, direction });
+        const velocity = (0, helpers_1.calculateVelocity)({ SPEED_UP_CONSTANT, delta, direction, speedFactor });
         velocity.multiplyScalar(delta);
         if (cameraController !== undefined)
             velocity.applyQuaternion(cameraController.camera.quaternion);

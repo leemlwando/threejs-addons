@@ -31,6 +31,7 @@ interface ControllerAPI {
     delta: number;
     SPEED_UP_CONSTANT: number;
     SLOW_DOWN_CONSTANT: number;
+    speedFactor: number;
     desiredMovementVector: Vector3;
     desiredVelocityVector: Vector3;
     cameraController?: CameraControllerType;
@@ -41,6 +42,8 @@ interface ControllerAPI {
     setRCC(RCC: RapierColliderController): void;
     setCCC(CCC: CameraController): void;
     setTCC(TCC: TranslationController): void;
+    updateSpeedFactor(increment: number): void;
+    setSpeedFactor(speedFactor: number): void;
     /** static methods */
 }
 
@@ -59,6 +62,7 @@ export class BaseController implements ControllerAPI {
     delta: number = 0;
     SPEED_UP_CONSTANT: number = 400;
     SLOW_DOWN_CONSTANT: number = 10;
+    speedFactor: number = 0.15;
     desiredMovementVector: Vector3 = new Vector3(0,0,0);
     desiredVelocityVector: Vector3 = new Vector3(0,0,0);
     cameraController?: CameraControllerType;
@@ -98,6 +102,18 @@ export class BaseController implements ControllerAPI {
      * */
     setTCC(TCC: TranslationController){
         this.TCC = TCC;
+    }
+
+    /**
+     * @description set speedfactor
+     * @param speedFactor: number
+     */
+    setSpeedFactor(speedFactor: number): void {
+        this.speedFactor = speedFactor;
+    }
+
+    updateSpeedFactor(increment: number): void {
+        this.speedFactor = Math.max(0.01, Math.min((this.speedFactor + increment), 1));
     }
     
 
@@ -160,13 +176,13 @@ export class BaseController implements ControllerAPI {
      * @param  
      * @returns 
      */
-    static computeTranslationXYZDirection({ translation, direction, SPEED_UP_CONSTANT, delta, cameraController  }: { translation: Vector3, direction: Vector3, SPEED_UP_CONSTANT: number,  delta: number, cameraController?: CameraControllerType | undefined }): { position: Vector3, velocity: Vector3 } | null {
+    static computeTranslationXYZDirection({ translation, direction, SPEED_UP_CONSTANT, delta, cameraController, speedFactor  }: { translation: Vector3, direction: Vector3, SPEED_UP_CONSTANT: number,  delta: number, speedFactor: number, cameraController?: CameraControllerType | undefined }): { position: Vector3, velocity: Vector3 } | null {
 
         const { x, y, z } = translation;
 
         const position = new Vector3(x, y, z);
         
-        const velocity = calculateVelocity({ SPEED_UP_CONSTANT, delta, direction });
+        const velocity = calculateVelocity({ SPEED_UP_CONSTANT, delta, direction, speedFactor });
 
         velocity.multiplyScalar(delta);
 

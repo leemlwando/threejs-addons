@@ -29,6 +29,7 @@ interface ControllerAPI {
     delta: number;
     SPEED_UP_CONSTANT: number;
     SLOW_DOWN_CONSTANT: number;
+    speedFactor: number;
     desiredMovementVector: Vector3;
     desiredVelocityVector: Vector3;
     cameraController?: CameraControllerType;
@@ -38,6 +39,8 @@ interface ControllerAPI {
     setRCC(RCC: RapierColliderController): void;
     setCCC(CCC: CameraController): void;
     setTCC(TCC: TranslationController): void;
+    updateSpeedFactor(increment: number): void;
+    setSpeedFactor(speedFactor: number): void;
 }
 export declare class BaseController implements ControllerAPI {
     options: any;
@@ -54,6 +57,7 @@ export declare class BaseController implements ControllerAPI {
     delta: number;
     SPEED_UP_CONSTANT: number;
     SLOW_DOWN_CONSTANT: number;
+    speedFactor: number;
     desiredMovementVector: Vector3;
     desiredVelocityVector: Vector3;
     cameraController?: CameraControllerType;
@@ -83,6 +87,12 @@ export declare class BaseController implements ControllerAPI {
      * */
     setTCC(TCC: TranslationController): void;
     /**
+     * @description set speedfactor
+     * @param speedFactor: number
+     */
+    setSpeedFactor(speedFactor: number): void;
+    updateSpeedFactor(increment: number): void;
+    /**
      * @description sets camera controller
      */
     setCameraController(cameraController: CameraControllerType): void;
@@ -108,11 +118,12 @@ export declare class BaseController implements ControllerAPI {
      * @param
      * @returns
      */
-    static computeTranslationXYZDirection({ translation, direction, SPEED_UP_CONSTANT, delta, cameraController }: {
+    static computeTranslationXYZDirection({ translation, direction, SPEED_UP_CONSTANT, delta, cameraController, speedFactor }: {
         translation: Vector3;
         direction: Vector3;
         SPEED_UP_CONSTANT: number;
         delta: number;
+        speedFactor: number;
         cameraController?: CameraControllerType | undefined;
     }): {
         position: Vector3;

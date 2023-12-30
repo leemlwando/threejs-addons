@@ -86,6 +86,7 @@ class RapierColliderController extends Base_1.BaseController {
         this.setColliderQuaternionFromCameraController();
         const { x: cx, y: cy, z: cz } = this.collider.translation();
         const computedTranslation = Base_1.BaseController.computeTranslationXYZDirection({
+            speedFactor: this.speedFactor,
             SPEED_UP_CONSTANT: this.SPEED_UP_CONSTANT,
             delta: this.delta,
             direction: this.direction,
