@@ -5,7 +5,7 @@ import { generateUUID } from 'three/src/math/MathUtils.ts';
 import { CameraControlType, CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types/index.ts';
 import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../wrappers/index.ts';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.ts';
 
 interface CameraControllerAPI {
 
@@ -193,7 +193,7 @@ export class CameraController implements CameraControllerAPI {
 
         this.controllers.forEach((controller: CameraControllerType, index: Index) => controller.active = index === this.currentControllerIndex);
 
-        let previouslyActiveController = this.activeController;
+        const previouslyActiveController = this.activeController;
 
         if(!previouslyActiveController){
             this.activeController = this.controllers[this.currentControllerIndex];

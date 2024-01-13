@@ -1,10 +1,10 @@
-import { Vector3 } from 'three/src/math/Vector3';
-import { Quaternion } from 'three/src/math/Quaternion';
-import { calculateVelocity } from "../../utils/helpers";
-import { CameraControllerType } from "../../types";
-import { TranslationController } from "./translation-controller";
-import { RapierColliderController } from "./rapier-character-controller";
-import { CameraController } from "./camera-controller";
+import { Vector3 } from 'three/src/math/Vector3.ts';
+import { Quaternion } from 'three/src/math/Quaternion.ts';
+import { calculateVelocity } from "../../utils/helpers.ts";
+import { CameraControllerType } from "../../types/index.ts";
+import { TranslationController } from "./translation-controller.ts";
+import { RapierColliderController } from "./rapier-character-controller.ts";
+import { CameraController } from "./camera-controller.ts";
 
 interface ControllerAPI {
     options: any;

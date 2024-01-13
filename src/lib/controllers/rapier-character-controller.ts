@@ -1,9 +1,9 @@
 import { World, KinematicCharacterController, Collider, CharacterCollision, QueryFilterFlags } from '@dimforge/rapier3d';
-import { BaseController } from './Base';
-import { Vector3 } from 'three/src/math/Vector3';
-import { Quaternion } from 'three/src/math/Quaternion';
-import { CameraControllerType } from '../../types';
-import { CameraController } from './camera-controller';
+import { BaseController } from './Base.ts';
+import { Vector3 } from 'three/src/math/Vector3.ts';
+import { Quaternion } from 'three/src/math/Quaternion.ts';
+import { CameraControllerType } from '../../types/index.ts';
+import { CameraController } from './camera-controller.ts';
 
 interface RapierColliderControllerAPI {
    world: World;
