@@ -20,8 +20,8 @@ export class RapierColliderController extends BaseController implements RapierCo
     collider: Collider | null = null;
     toi: number = 0;
     
-    constructor({ world, offset, options, RCC, CCC } : { world: World, offset: number, options: object, RCC: RapierColliderController, CCC: CameraController }){
-        super({ target: null, options, RCC, CCC });
+    constructor({ world, offset, options, CCC } : { world: World, offset: number, options: object, CCC?: CameraController }){
+        super({ target: null, options, CCC });
         this.world = world;
         this.offset = offset;
         this.controller = this.initCharacterController();
@@ -103,10 +103,9 @@ export class RapierColliderController extends BaseController implements RapierCo
      */
     setCollider(collider: Collider, updateTargetPosition?: boolean): void {
         this.collider = collider;
-
         if(!this.target && !updateTargetPosition)return;
         const { x, y, z} = this.collider.translation();
-        this.desiredMovementVector = new Vector3(z,y,z);
+        this.desiredMovementVector = new Vector3(x,y,z);
         this.updateTargetPosition();
     }
 
@@ -119,6 +118,7 @@ export class RapierColliderController extends BaseController implements RapierCo
         const { x: cx, y: cy, z: cz } = this.collider.translation();
 
         const computedTranslation = BaseController.computeTranslationXYZDirection({
+            speedFactor: this.speedFactor,
             SPEED_UP_CONSTANT: this.SPEED_UP_CONSTANT,
             delta: this.delta,
             direction: this.direction,
@@ -162,9 +162,15 @@ export class RapierColliderController extends BaseController implements RapierCo
         }else{
             this.desiredMovementVector = desiredMovementVector;
             /** carry out corrections based on max an min translation options */
-            this.desiredMovementVector.y = Math.min(Math.max(this.desiredMovementVector.y, this.options?.translation?.max?.y), this.options?.translation?.max?.y);
+            // this.desiredMovementVector.y = Math.min(Math.max(this.desiredMovementVector.y, this.options?.translation?.max?.y), this.options?.translation?.max?.y);
+            // this.desiredVelocityVector = desiredVelocityVector;
+            // this.desiredVelocityVector.y = Math.min(Math.max(this.desiredMovementVector.y, this.options?.translation?.max?.y), this.options?.translation?.max?.y);
+            
+            this.desiredMovementVector.y = shapePosition.y
             this.desiredVelocityVector = desiredVelocityVector;
-            this.desiredVelocityVector.y = Math.min(Math.max(this.desiredMovementVector.y, this.options?.translation?.max?.y), this.options?.translation?.max?.y);
+            this.desiredVelocityVector.y = 0
+        
+
         }
 
         /** update computational values */
@@ -212,5 +218,16 @@ export class RapierColliderController extends BaseController implements RapierCo
     private _updateColliderVelocity(): void {
         if(!this.collider) return;
         this.velocity.copy(this.desiredVelocityVector);
+    }
+
+
+    /** update filter groups on options */
+    updateFilterGroups(groups: number){
+        this.options.filterGroups = groups;
+    }
+
+    /** update options */
+    updateOptions(options: object){
+        this.options = options;
     }
 }

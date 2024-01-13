@@ -124,6 +124,7 @@ class CameraController {
                 if ('enabled' in control && control.userData.type === types_1.ControlType.ORBIT_CONTROLS) {
                     control.userData.active = true;
                     control.enabled = true;
+                    this.normalizeOrbitControlsTarget(control);
                     control.update();
                 }
             });
@@ -194,6 +195,7 @@ class CameraController {
             control.userData.active = control.userData.type === activeControlType;
             if ('update' in control && control.userData.type === types_1.ControlType.ORBIT_CONTROLS && activeControlType === types_1.ControlType.ORBIT_CONTROLS) {
                 control.enabled = true;
+                this.normalizeOrbitControlsTarget(control);
                 control.update();
             }
             if ('lock' in control && control.userData.type === types_1.ControlType.POINTER_LOCK_CONTROLS && activeControlType === types_1.ControlType.POINTER_LOCK_CONTROLS) {
@@ -242,6 +244,13 @@ class CameraController {
             currControl.connect();
             currControl.lock();
         }
+    }
+    normalizeOrbitControlsTarget(control) {
+        const direction = new Vector3_1.Vector3(0, 0, -1);
+        direction.applyQuaternion(control.object.quaternion);
+        const distance = 0.2; // The distance in front of the camera
+        const target = new Vector3_1.Vector3().copy(control.object.position).add(direction.multiplyScalar(distance));
+        control.target.copy(target);
     }
 }
 exports.CameraController = CameraController;

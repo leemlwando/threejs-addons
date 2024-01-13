@@ -29,6 +29,7 @@ export class TranslationController extends BaseController {
         const { x: px, y: py, z: pz } = orbitControls.object.position;
 
         const computedTranslation = BaseController.computeTranslationXYZDirection({
+            speedFactor: this.speedFactor,
             SPEED_UP_CONSTANT: this.SPEED_UP_CONSTANT,
             delta: this.delta,
             direction: this.direction,
@@ -77,10 +78,11 @@ export class TranslationController extends BaseController {
          const { x: px, y: py, z: pz } = pointerLockControls.camera.position;
 
          const computedTranslation = BaseController.computeTranslationXYZDirection({
-             SPEED_UP_CONSTANT: this.SPEED_UP_CONSTANT,
-             delta: this.delta,
-             direction: this.direction,
-             translation: new Vector3(px, py, pz),
+            speedFactor: this.speedFactor,
+            SPEED_UP_CONSTANT: this.SPEED_UP_CONSTANT,
+            delta: this.delta,
+            direction: this.direction,
+            translation: new Vector3(px, py, pz),
             //  cameraController: this.cameraController as CameraControllerType //causing funny side effects
          });
  

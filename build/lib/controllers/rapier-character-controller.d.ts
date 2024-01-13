@@ -14,12 +14,11 @@ export declare class RapierColliderController extends BaseController implements 
     controller: KinematicCharacterController;
     collider: Collider | null;
     toi: number;
-    constructor({ world, offset, options, RCC, CCC }: {
+    constructor({ world, offset, options, CCC }: {
         world: World;
         offset: number;
         options: object;
-        RCC: RapierColliderController;
-        CCC: CameraController;
+        CCC?: CameraController;
     });
     /**
      * @description sets up the character controller
@@ -66,5 +65,9 @@ export declare class RapierColliderController extends BaseController implements 
     private _updateColliderQuaternion;
     /** update internal this.velocity */
     private _updateColliderVelocity;
+    /** update filter groups on options */
+    updateFilterGroups(groups: number): void;
+    /** update options */
+    updateOptions(options: object): void;
 }
 export {};

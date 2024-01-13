@@ -5,6 +5,7 @@ import { generateUUID } from 'three/src/math/MathUtils';
 import { CameraControlType, CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types';
 import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../wrappers';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 interface CameraControllerAPI {
 
@@ -205,7 +206,8 @@ export class CameraController implements CameraControllerAPI {
                 if('enabled' in control && control.userData.type === ControlType.ORBIT_CONTROLS){
                     control.userData.active = true;
                     control.enabled = true;
-                    control.update()
+                    this.normalizeOrbitControlsTarget(control);
+                    control.update();
                 }
             })
 
@@ -292,6 +294,7 @@ export class CameraController implements CameraControllerAPI {
 
             if('update' in control && control.userData.type === ControlType.ORBIT_CONTROLS && activeControlType === ControlType.ORBIT_CONTROLS){
                 control.enabled = true;
+                this.normalizeOrbitControlsTarget(control);
                 control.update();
             }
 
@@ -339,7 +342,6 @@ export class CameraController implements CameraControllerAPI {
             /** get previous controls look direction */
             const lookdirection = new Vector3();
             prevControl.getDirection(lookdirection);
-
             const lookAtPoint = new  Vector3().copy(this.activeController.camera.position).add(lookdirection);
             currControl.target.copy(lookAtPoint);
             currControl.enabled = true;
@@ -347,8 +349,20 @@ export class CameraController implements CameraControllerAPI {
          }
  
          if('lock' in currControl && currControl?.userData.type === ControlType.POINTER_LOCK_CONTROLS){
+           
              currControl.connect();
              currControl.lock();
          }
+    }
+
+
+    private normalizeOrbitControlsTarget(control: OrbitControls){
+        const direction = new Vector3(0, 0, -1);
+        direction.applyQuaternion(control.object.quaternion);
+
+        const distance = 0.2; // The distance in front of the camera
+        const target = new Vector3().copy(control.object.position).add(direction.multiplyScalar(distance));
+
+        control.target.copy(target);
     }
 }

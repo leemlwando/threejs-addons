@@ -20,6 +20,7 @@ class TranslationController extends Base_1.BaseController {
         }
         const { x: px, y: py, z: pz } = orbitControls.object.position;
         const computedTranslation = Base_1.BaseController.computeTranslationXYZDirection({
+            speedFactor: this.speedFactor,
             SPEED_UP_CONSTANT: this.SPEED_UP_CONSTANT,
             delta: this.delta,
             direction: this.direction,
@@ -58,6 +59,7 @@ class TranslationController extends Base_1.BaseController {
         }
         const { x: px, y: py, z: pz } = pointerLockControls.camera.position;
         const computedTranslation = Base_1.BaseController.computeTranslationXYZDirection({
+            speedFactor: this.speedFactor,
             SPEED_UP_CONSTANT: this.SPEED_UP_CONSTANT,
             delta: this.delta,
             direction: this.direction,
