@@ -1,7 +1,9 @@
 {
     "imports": {
+      "three": "npm:/three@0.160.0",
       "three/": "npm:/three@0.160.0/",
-      "@dimforge/rapier3d": "npm:@dimforge/rapier3d"
+      "@dimforge/rapier3d": "npm:@dimforge/rapier3d@0.11.2",
+      "@dimforge/rapier3d/": "npm:@dimforge/rapier3d@0.11.2/"
     },
     "nodeModulesDir": true
   }

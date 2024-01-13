@@ -15,6 +15,11 @@ You can get the package via npm:
 npm i --save @threejs-addons/threejs-addons
 ```
 
+or you can load via deno.land in your deno projects : [https://deno.land/x/threejs_addons](https://deno.land/x/threejs_addons)
+```
+import * as threejsAddons from "https://deno.land/x/threejs_addons@LATEST_TAG/mod.ts";
+```
+
 ## Usage
 
 To begin using the addons, simply import them into your project
