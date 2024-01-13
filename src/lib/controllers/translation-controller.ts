@@ -1,11 +1,11 @@
-import { Vector3 } from 'three/src/math/Vector3';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
-import { CameraControllerType, ControlType } from '../../types';
-import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../types/wrappers';
-import { BaseController } from './Base';
-import { RapierColliderController } from './rapier-character-controller';
-import { CameraController } from './camera-controller';
+import { Vector3 } from 'three/src/math/Vector3.ts';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.ts';
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.ts';
+import { CameraControllerType, ControlType } from '../../types/index.ts';
+import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../types/wrappers/index.ts';
+import { BaseController } from './Base.ts';
+import { RapierColliderController } from './rapier-character-controller.ts';
+import { CameraController } from './camera-controller.ts';
 
 export class TranslationController extends BaseController {
 

@@ -1,6 +1,6 @@
 {
   "name": "@threejs-addons/threejs-addons",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "free & opensource threejs addons to boost productivity",
   "main": "build/index.js",
   "scripts": {
