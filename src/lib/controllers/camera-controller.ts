@@ -1,9 +1,9 @@
-import { Scene } from 'three/src/scenes/Scene';
-import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
-import { Vector3 } from 'three/src/math/Vector3';
-import { degToRad, generateUUID } from 'three/src/math/MathUtils';
-import { CameraControlType, CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types';
-import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../wrappers';
+import { Scene } from 'three/src/scenes/Scene.ts';
+import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera.ts';
+import { Vector3 } from 'three/src/math/Vector3.ts';
+import { generateUUID } from 'three/src/math/MathUtils.ts';
+import { CameraControlType, CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types/index.ts';
+import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../wrappers/index.ts';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
@@ -185,7 +185,7 @@ export class CameraController implements CameraControllerAPI {
     }
 
     /** set the active controller from your list of controllers */
-    setActiveController(index: Index, disableCurrentController: boolean): void {
+    setActiveController(index: Index): void {
 
         if(index > this.controllers.length - 1) throw new Error(`index ${index} is out of range`);
         
@@ -214,7 +214,7 @@ export class CameraController implements CameraControllerAPI {
                     // this.activeController?.camera.lookAt(control.target);
                     // this.activeController?.camera.rotateY(90)
                     // this.updateProjectionMatrix()
-                    control.update();
+                    (control as OrbitControls).update();
                 }
             })
 
@@ -222,7 +222,7 @@ export class CameraController implements CameraControllerAPI {
         }
 
 
-        let activeControlType = this.getCurrentActiveControlType();
+        const activeControlType = this.getCurrentActiveControlType();
 
         this.activeController = this.controllers[this.currentControllerIndex];
 
@@ -244,7 +244,7 @@ export class CameraController implements CameraControllerAPI {
     /** get active control type */
     getCurrentActiveControlType(): ControlType.ORBIT_CONTROLS | ControlType.POINTER_LOCK_CONTROLS | null {
 
-       let activeControl = this.activeController?.controls.find((control: OrbitControlsWrapper | PointerLockControlsWrapper ) => control.userData && control.userData.active === true)
+       const activeControl = this.activeController?.controls.find((control: OrbitControlsWrapper | PointerLockControlsWrapper ) => control.userData && control.userData.active === true)
 
        if(!activeControl?.userData) return null;
 

@@ -1,3 +1,3 @@
-export * from './rapier-character-controller';
-export * from './translation-controller';
-export * from './camera-controller'
+export * from './rapier-character-controller.ts';
+export * from './translation-controller.ts';
+export * from './camera-controller.ts'
