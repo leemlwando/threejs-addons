@@ -18,7 +18,7 @@ interface CameraControllerAPI {
     /** methods */
     switchControllerNext(index: Index | null): Index | null;
     switchControlTypeNext(index: Index | null): Index;
-    configureController(args: configureControllerArgsType): void;
+    configureController(args: configureControllerArgsType, cameraOptions: object): void;
     setActiveController(index: Index, disableCurrentController: boolean): void;
     getCurrentActiveControlType(): ControlType.ORBIT_CONTROLS | ControlType.POINTER_LOCK_CONTROLS | null;
     onResize({ width, height }: {
@@ -52,7 +52,7 @@ export declare class CameraController implements CameraControllerAPI {
     /** toggle controls */
     switchControlTypeNext(index: Index | null): Index;
     /** configure each controller to add to the controllers list */
-    configureController(args: configureControllerArgsType): void;
+    configureController(args: configureControllerArgsType, cameraOptions?: object): void;
     /** set the active controller from your list of controllers */
     setActiveController(index: Index, disableCurrentController: boolean): void;
     /** get active control type */

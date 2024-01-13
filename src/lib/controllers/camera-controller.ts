@@ -1,7 +1,7 @@
 import { Scene } from 'three/src/scenes/Scene';
 import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
 import { Vector3 } from 'three/src/math/Vector3';
-import { generateUUID } from 'three/src/math/MathUtils';
+import { degToRad, generateUUID } from 'three/src/math/MathUtils';
 import { CameraControlType, CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types';
 import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../wrappers';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
@@ -31,7 +31,7 @@ interface CameraControllerAPI {
     /** methods */
     switchControllerNext(index: Index | null): Index | null;
     switchControlTypeNext(index: Index | null): Index;
-    configureController(args: configureControllerArgsType): void;
+    configureController(args: configureControllerArgsType, cameraOptions: object): void;
     setActiveController(index: Index, disableCurrentController: boolean): void;
     getCurrentActiveControlType(): ControlType.ORBIT_CONTROLS | ControlType.POINTER_LOCK_CONTROLS | null;
     onResize({ width, height }: { width: number, height: number }): void;
@@ -120,7 +120,7 @@ export class CameraController implements CameraControllerAPI {
     }
 
     /** configure each controller to add to the controllers list */
-    configureController( args: configureControllerArgsType ): void {
+    configureController( args: configureControllerArgsType, cameraOptions?: object ): void {
 
         if(!args) throw new Error('no options passed to configure');
 
@@ -134,9 +134,11 @@ export class CameraController implements CameraControllerAPI {
             this.scene.add(camera);
         }
 
-        /** configure camera */
-        camera.aspect = window.innerWidth/window.innerHeight;
-        camera.fov = 75;
+        /** configure camera opions */
+        for(const option in cameraOptions){
+            (camera as any)[option] = (cameraOptions as any)[option];
+        }
+        /** update camera matrix */
         camera.updateProjectionMatrix();
 
         for(const control of  args.controls){
@@ -207,6 +209,11 @@ export class CameraController implements CameraControllerAPI {
                     control.userData.active = true;
                     control.enabled = true;
                     this.normalizeOrbitControlsTarget(control);
+                    // control.object.lookAt(control.target);
+                    // control.object.setRotationFromAxisAngle(control.object.position, 90 * (Math.PI/180));
+                    // this.activeController?.camera.lookAt(control.target);
+                    // this.activeController?.camera.rotateY(90)
+                    // this.updateProjectionMatrix()
                     control.update();
                 }
             })

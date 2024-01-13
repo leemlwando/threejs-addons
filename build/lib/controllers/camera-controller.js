@@ -65,7 +65,7 @@ class CameraController {
         return this.currentControlTypeIndex;
     }
     /** configure each controller to add to the controllers list */
-    configureController(args) {
+    configureController(args, cameraOptions) {
         if (!args)
             throw new Error('no options passed to configure');
         const controls = [];
@@ -74,9 +74,11 @@ class CameraController {
         if (this.scene !== undefined) {
             this.scene.add(camera);
         }
-        /** configure camera */
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.fov = 75;
+        /** configure camera opions */
+        for (const option in cameraOptions) {
+            camera[option] = cameraOptions[option];
+        }
+        /** update camera matrix */
         camera.updateProjectionMatrix();
         for (const control of args.controls) {
             if (control.type === types_1.ControlType.ORBIT_CONTROLS) {
@@ -125,6 +127,11 @@ class CameraController {
                     control.userData.active = true;
                     control.enabled = true;
                     this.normalizeOrbitControlsTarget(control);
+                    // control.object.lookAt(control.target);
+                    // control.object.setRotationFromAxisAngle(control.object.position, 90 * (Math.PI/180));
+                    // this.activeController?.camera.lookAt(control.target);
+                    // this.activeController?.camera.rotateY(90)
+                    // this.updateProjectionMatrix()
                     control.update();
                 }
             });
