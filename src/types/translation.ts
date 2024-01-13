@@ -1,9 +1,9 @@
-import * as RAPIER from '@dimforge/rapier3d-compat';
+import * as RAPIER from '@dimforge/rapier3d';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
-import { CameraControlType, CameraControllerType, ControlType } from '.';
-import { OrbitControlsWrapper, PointerLockControlsWrapper } from './wrappers';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
+import { CameraControlType, CameraControllerType, ControlType } from './index.ts';
+import { OrbitControlsWrapper, PointerLockControlsWrapper } from './wrappers/index.ts';
 
 export type Velocity = THREE.Vector3;
 
