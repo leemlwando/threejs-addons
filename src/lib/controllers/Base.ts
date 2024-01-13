@@ -1,5 +1,5 @@
-import { Vector3 } from 'three/src/math/Vector3.ts';
-import { Quaternion } from 'three/src/math/Quaternion.ts';
+import { Vector3 } from 'three/src/math/Vector3.js';
+import { Quaternion } from 'three/src/math/Quaternion.js';
 import { calculateVelocity } from "../../utils/helpers.ts";
 import { CameraControllerType } from "../../types/index.ts";
 import { TranslationController } from "./translation-controller.ts";

@@ -1,6 +1,6 @@
-import { Vector3 } from 'three/src/math/Vector3.ts';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.ts';
-import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.ts';
+import { Vector3 } from 'three/src/math/Vector3.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 import { CameraControllerType, ControlType } from '../../types/index.ts';
 import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../types/wrappers/index.ts';
 import { BaseController } from './Base.ts';

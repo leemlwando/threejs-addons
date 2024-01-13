@@ -2,6 +2,7 @@
   "version": "3",
   "packages": {
     "specifiers": {
+      "npm:@dimforge/rapier3d@0.11.2": "npm:@dimforge/rapier3d@0.11.2",
       "npm:@dimforge/rapier3d@^0.11.2": "npm:@dimforge/rapier3d@0.11.2",
       "npm:@threejs-addons/types@^0.1.0": "npm:@threejs-addons/types@0.1.0",
       "npm:@types/three@^0.160.0": "npm:@types/three@0.160.0",
