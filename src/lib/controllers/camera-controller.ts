@@ -1,9 +1,9 @@
-import { Scene } from 'three/src/scenes/Scene';
-import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera';
-import { Vector3 } from 'three/src/math/Vector3';
-import { degToRad, generateUUID } from 'three/src/math/MathUtils';
-import { CameraControlType, CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types';
-import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../wrappers';
+import { Scene } from 'three/src/scenes/Scene.ts';
+import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera.ts';
+import { Vector3 } from 'three/src/math/Vector3.ts';
+import { degToRad, generateUUID } from 'three/src/math/MathUtils.ts';
+import { CameraControlType, CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types/index.ts';
+import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../wrappers/index.ts';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
