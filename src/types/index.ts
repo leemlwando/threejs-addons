@@ -1,5 +1,4 @@
-import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera.js';
-import { Camera } from 'three/src/cameras/Camera.js'
+import { PerspectiveCamera, Camera } from '@deps';
 import { OrbitControlsWrapper, PointerLockControlsWrapper } from './wrappers/index.ts';
 
 export type Index = number;

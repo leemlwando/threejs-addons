@@ -1,11 +1,15 @@
-import { Scene } from 'three/src/scenes/Scene.js';
-import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera.js';
-import { Vector3 } from 'three/src/math/Vector3.js';
-import { generateUUID } from 'three/src/math/MathUtils.js';
+import { 
+    Scene,
+     PerspectiveCamera, 
+     Vector3, 
+     generateUUID,
+     OrbitControls,
+     PointerLockControls 
+    } from '@deps';
 import { CameraControlType, CameraControllerType, ControlType, Index, configureControllerArgsType } from '../../types/index.ts';
 import { OrbitControlsWrapper, PointerLockControlsWrapper } from '../../wrappers/index.ts';
-import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+console.log(generateUUID)
 
 interface CameraControllerAPI {
 

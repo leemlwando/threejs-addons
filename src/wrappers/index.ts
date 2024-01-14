@@ -1,6 +1,6 @@
 import { CameraControlUserData } from "../types/index.ts";
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
+import { OrbitControls } from '@deps';
+import { PointerLockControls } from '@deps';
 
 
 export class OrbitControlsWrapper extends OrbitControls {
