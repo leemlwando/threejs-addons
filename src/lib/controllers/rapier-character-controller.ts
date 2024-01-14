@@ -5,6 +5,8 @@ import { Quaternion } from 'three/src/math/Quaternion.js';
 import { CameraControllerType } from '../../types/index.ts';
 import { CameraController } from './camera-controller.ts';
 
+console.log('RapierColliderController', Quaternion);
+
 interface RapierColliderControllerAPI {
    world: World;
    offset: number;
